@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================
+  # 阶段 1：依赖安装（缓存）
+  # ============================================================
+  install:
+    name: 📦 安装依赖
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 上传依赖缓存
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
+  # ============================================================
+  # 阶段 2：质量门禁（typecheck + lint + test）
+  # ============================================================
+  quality:
+    name: 🔍 质量门禁
+    runs-on: ubuntu-latest
+    needs: install
+    timeout-minutes: 15
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 TypeScript 编译门禁
+        run: pnpm typecheck
+
+      # Next 16 已移除 next lint 命令，ESLint 门禁由 standalone eslint 接管（待配置 flat config 后启用）
+      # - name: 🔎 ESLint 代码规范
+      #   run: pnpm lint
+
+      - name: 📑 OpenAPI 契约同步门禁
+        run: |
+          pnpm openapi:generate
+          if ! git diff --exit-code public/docs/openapi.generated.yaml; then
+            echo "::error::OpenAPI 契约未同步 —— 请本地运行 pnpm openapi:generate 并提交更新后的 public/docs/openapi.generated.yaml"
+            exit 1
+          fi
+
+      - name: ✅ 单元测试 + 覆盖率
+        run: pnpm test:coverage
+
+      - name: 上传覆盖率报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  # ============================================================
+  # 阶段 3：生产构建
+  # ============================================================
+  build:
+    name: 🏗️ 生产构建
+    runs-on: ubuntu-latest
+    needs: [install, quality]
+    timeout-minutes: 20
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ next build
+        run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: |
+            .next
+            public
+          retention-days: 3
+          if-no-files-found: ignore

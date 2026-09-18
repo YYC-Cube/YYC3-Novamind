@@ -1,0 +1,29 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "YYC³ NovaMind API",
+    "version": "2.0.0",
+    "description": "YYC³ NovaMind 全栈 API 契约（自动生成）"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3218/api",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "apiDir": "./app/api",
+  "schemaDir": "./openapi/types",
+  "docsUrl": "api-docs",
+  "ui": "swagger",
+  "outputFile": "docs/openapi.generated.yaml",
+  "includeOpenApiRoutes": true
+}

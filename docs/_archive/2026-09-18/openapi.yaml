@@ -1,0 +1,735 @@
+openapi: 3.1.0
+info:
+  title: YYC³ NovaMind API
+  version: 2.0.0
+  description: |
+    YYC³ NovaMind 全栈 API 契约（OpenAPI 3.1）。
+
+    本契约由 M3 MiniMax 导师于 2026-09-18 自动扫描 `app/api/**` 导出函数生成，
+    覆盖 13 个路由文件 / 30 个端点，作为前后端对接的唯一权威来源。
+
+    ## 五维契约原则
+    - **时间维**：所有时间字段统一 ISO-8601 UTC
+    - **空间维**：所有路径相对 baseURL（默认 `http://localhost:3218`）
+    - **属性维**：所有响应含 `success: boolean`，错误码与 `lib/error-handler.ts` 对齐
+    - **事件维**：所有 POST/PUT 操作记录 trace_id 用于审计
+    - **关联维**：复杂资源附带 `_links` 字段指向关联资源
+  contact:
+    name: YYC³ Team
+    email: admin@0379.email
+  license:
+    name: Copyright © 2025-2026 YanYuCloudCube
+    identifier: YYC-Internal
+
+servers:
+  - url: http://localhost:3218
+    description: 本地开发（端口 3218）
+  - url: https://staging.api.yyc3.app
+    description: 预发布
+  - url: https://api.yyc3.app
+    description: 生产
+
+tags:
+  - name: AI
+    description: AI 服务管理（提供商切换、状态查询、文本生成）
+  - name: Image
+    description: 图像分析
+  - name: Auth
+    description: 认证与会话
+  - name: Chat
+    description: AI 对话
+  - name: Database
+    description: 数据库代理与数据访问
+  - name: Performance
+    description: 性能指标与监控
+  - name: Speech
+    description: 语音识别
+  - name: Status
+    description: 服务健康状态
+  - name: ServiceWorker
+    description: Service Worker 路由
+  - name: Sync
+    description: 离线数据同步
+  - name: Offline
+    description: 离线测试
+  - name: Upload
+    description: 文件上传
+
+paths:
+  # ===== AI =====
+  /api/ai:
+    get:
+      tags: [AI]
+      summary: 查询 AI 服务状态 / 提供商
+      parameters:
+        - in: query
+          name: action
+          required: true
+          schema:
+            type: string
+            enum: [status, providers, current_provider, test_provider]
+        - in: query
+          name: provider
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [AI]
+      summary: AI 文本生成（流式或单次）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [AI]
+      summary: 切换 AI 提供商或更新配置
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIConfigUpdate'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # ===== Image =====
+  /api/analyze-image:
+    post:
+      tags: [Image]
+      summary: 图像内容分析
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageAnalyzeRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    get:
+      tags: [Image]
+      summary: 获取图像分析能力 / 模型元数据
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Auth =====
+  /api/auth:
+    get:
+      tags: [Auth]
+      summary: 查询当前会话
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Auth]
+      summary: 登录 / 注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Auth]
+      summary: 更新用户资料 / 刷新会话
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthUpdate'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Chat =====
+  /api/chat:
+    post:
+      tags: [Chat]
+      summary: AI 对话（非流式）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    get:
+      tags: [Chat]
+      summary: 获取历史会话列表
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /api/chat/stream:
+    post:
+      tags: [Chat]
+      summary: AI 对话（流式 / SSE）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: SSE 流
+          content:
+            text/event-stream:
+              schema:
+                type: string
+    get:
+      tags: [Chat]
+      summary: 获取流式连接元数据
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Database =====
+  /api/database:
+    get:
+      tags: [Database]
+      summary: 查询数据
+      parameters:
+        - in: query
+          name: table
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags: [Database]
+      summary: 写入数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    delete:
+      tags: [Database]
+      summary: 删除数据
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Performance =====
+  /api/performance:
+    get:
+      tags: [Performance]
+      summary: 获取性能指标
+      parameters:
+        - in: query
+          name: action
+          required: false
+          schema:
+            type: string
+            enum: [report, memory, operation_stats]
+        - in: query
+          name: operation
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags: [Performance]
+      summary: 触发性能采样 / 重置指标
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Speech =====
+  /api/speech-to-text:
+    post:
+      tags: [Speech]
+      summary: 语音识别
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                language:
+                  type: string
+                  default: zh-CN
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    get:
+      tags: [Speech]
+      summary: 获取语音识别能力元数据
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Status =====
+  /api/status:
+    get:
+      tags: [Status]
+      summary: 全部服务健康检查
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags: [Status]
+      summary: 触发深度健康检查
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Service Worker =====
+  /api/sw:
+    get:
+      tags: [ServiceWorker]
+      summary: Service Worker 路由 / 缓存策略
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Sync =====
+  /api/sync:
+    get:
+      tags: [Sync]
+      summary: 拉取增量数据
+      parameters:
+        - in: query
+          name: since
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags: [Sync]
+      summary: 推送变更
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    put:
+      tags: [Sync]
+      summary: 合并远端数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    delete:
+      tags: [Sync]
+      summary: 删除同步条目
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Offline Test =====
+  /api/test-offline:
+    get:
+      tags: [Offline]
+      summary: 离线模式探测
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags: [Offline]
+      summary: 模拟离线请求
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===== Upload =====
+  /api/upload:
+    post:
+      tags: [Upload]
+      summary: 文件上传（multipart/form-data）
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    get:
+      tags: [Upload]
+      summary: 上传能力元数据（允许类型 / 大小）
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+components:
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: 未授权
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalError:
+      description: 内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+  schemas:
+    ApiResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          description: 业务是否成功
+        data:
+          description: 业务负载（任意 JSON）
+        message:
+          type: string
+        trace_id:
+          type: string
+          description: 链路追踪 ID
+        timestamp:
+          type: string
+          format: date-time
+    ApiError:
+      type: object
+      required: [success, error]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [VALIDATION, AUTH, FORBIDDEN, NOT_FOUND, CONFLICT, RATE_LIMIT, INTERNAL]
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
+            severity:
+              type: string
+              enum: [LOW, MEDIUM, HIGH, CRITICAL]
+            trace_id:
+              type: string
+    AIRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt:
+          type: string
+          minLength: 1
+        provider:
+          type: string
+          enum: [openai, anthropic, mock]
+        model:
+          type: string
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          default: 0.7
+        maxTokens:
+          type: integer
+          minimum: 1
+          maximum: 32000
+        stream:
+          type: boolean
+          default: false
+    AIConfigUpdate:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          type: string
+        apiKey:
+          type: string
+          description: 可选，覆盖环境变量
+    ImageAnalyzeRequest:
+      type: object
+      required: [imageUrl]
+      properties:
+        imageUrl:
+          type: string
+          format: uri
+        prompt:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+            enum: [object_detection, ocr, scene_classification, color_analysis]
+    AuthRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        action:
+          type: string
+          enum: [login, register, forgot_password]
+    AuthUpdate:
+      type: object
+      properties:
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+          format: uri
+        preferences:
+          type: object
+          additionalProperties: true
+    ChatRequest:
+      type: object
+      required: [messages]
+      properties:
+        messages:
+          type: array
+          items:
+            type: object
+            required: [role, content]
+            properties:
+              role:
+                type: string
+                enum: [system, user, assistant]
+              content:
+                type: string
+        model:
+          type: string
+        temperature:
+          type: number
+        stream:
+          type: boolean
+          default: false
+
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: yyc3_session
+      description: 会话 Cookie
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 备用 Bearer Token
+
+security:
+  - sessionCookie: []
+  - bearerAuth: []

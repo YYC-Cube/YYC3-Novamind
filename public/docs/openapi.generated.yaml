@@ -1,0 +1,2120 @@
+openapi: 3.0.0
+info:
+  title: YYC³ NovaMind API
+  version: 2.0.0
+  description: YYC³ NovaMind 全栈 API 契约（自动生成）
+servers:
+  - url: http://localhost:3218/api
+    description: Local development server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AIConfigUpdate:
+      type: object
+      properties:
+        action:
+          type: string
+          description: 动作：optimize_performance | clear_cache | update_config
+          nullable: false
+        data:
+          type: object
+          properties:
+            provider:
+              type: string
+              description: 提供商名称
+              nullable: true
+            config:
+              type: object
+              additionalProperties: {}
+              description: 配置对象
+              nullable: true
+          nullable: true
+      required:
+        - action
+    AIQuery:
+      type: object
+      properties:
+        action:
+          type: string
+          description: status / providers / current_provider / test_provider / health
+        provider:
+          type: string
+          description: test_provider 时必填
+      required:
+        - action
+    AIRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          description: 动作：chat | stream_chat | switch_provider | select_best_provider | batch_process
+          nullable: false
+        data:
+          type: object
+          properties:
+            messages:
+              type: array
+              items:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    enum:
+                      - system
+                      - user
+                      - assistant
+                    description: 消息角色
+                    nullable: false
+                  content:
+                    type: string
+                    description: 消息内容（1-32000 字符）
+                    nullable: false
+                required:
+                  - role
+                  - content
+              description: 对话消息列表（chat / stream_chat）
+              nullable: true
+            provider:
+              type: string
+              description: 目标提供商（switch_provider）
+              nullable: true
+            temperature:
+              type: number
+              description: 采样温度
+              nullable: true
+            maxTokens:
+              type: number
+              description: 最大 token
+              nullable: true
+            model:
+              type: string
+              description: 模型名称
+              nullable: true
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  content:
+                    type: string
+                    nullable: false
+                required:
+                  - content
+              description: 批处理项目（batch_process）
+              nullable: true
+            processorType:
+              type: string
+              description: 批处理器类型：summarize | translate | analyze
+              nullable: true
+          description: 动作数据负载
+          nullable: true
+        options:
+          type: object
+          additionalProperties: {}
+          description: 扩展选项
+          nullable: true
+      required:
+        - action
+    AIResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          description: 业务数据负载
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+        metadata:
+          type: object
+          properties:
+            processingTime:
+              type: number
+              description: 处理耗时 ms
+            provider:
+              type: string
+              description: 使用的提供商
+          required:
+            - processingTime
+            - provider
+          description: 元数据（处理耗时 / 实际提供商）
+    AIStatusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          type: object
+          properties:
+            activeProvider:
+              type: string
+              description: 当前活跃提供商
+            providers:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                  latency:
+                    type: number
+                required:
+                  - available
+              description: 各提供商可用性
+          required:
+            - activeProvider
+            - providers
+          description: AI 服务状态
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+      required:
+        - data
+    ApiEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          description: 业务数据负载
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+      required:
+        - success
+    ApiErrorInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: 错误类型标识
+        message:
+          type: string
+          description: 用户可读错误信息
+        id:
+          type: string
+          description: 错误唯一 ID（链路追踪）
+        details:
+          type: string
+          description: 调试详情
+      required:
+        - type
+        - message
+    AuthQuery:
+      type: object
+      properties:
+        action:
+          type: string
+          description: current_user / verify_email
+        token:
+          type: string
+          description: verify_email 时必填
+      required:
+        - action
+    AuthRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          description: 动作：login | register | wechat_login | refresh_token | reset_password | change_password | logout
+          nullable: false
+        email:
+          type: string
+          description: 邮箱
+          nullable: true
+        username:
+          type: string
+          description: 用户名
+          nullable: true
+        password:
+          type: string
+          description: 密码
+          nullable: true
+        confirmPassword:
+          type: string
+          description: 确认密码（register）
+          nullable: true
+        rememberMe:
+          type: boolean
+          description: 记住我（login）
+          nullable: true
+        acceptTerms:
+          type: boolean
+          description: 同意条款（register）
+          nullable: true
+        inviteCode:
+          type: string
+          description: 邀请码（register）
+          nullable: true
+        code:
+          type: string
+          description: 微信 code（wechat_login）
+          nullable: true
+        state:
+          type: string
+          description: 微信 state（wechat_login）
+          nullable: true
+        oldPassword:
+          type: string
+          description: 旧密码（change_password）
+          nullable: true
+        newPassword:
+          type: string
+          description: 新密码（change_password）
+          nullable: true
+      required:
+        - action
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          description: 业务数据负载
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+        accessToken:
+          type: string
+          description: 访问令牌（login / wechat_login 成功时）
+        refreshToken:
+          type: string
+          description: 刷新令牌
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              description: 用户 ID
+            email:
+              type: string
+              description: 邮箱
+            username:
+              type: string
+              description: 用户名
+          required:
+            - id
+            - email
+            - username
+          description: 用户信息
+    AuthUpdate:
+      type: object
+      properties:
+        action:
+          type: string
+          description: 动作：update_profile
+          nullable: false
+        updates:
+          type: object
+          additionalProperties: {}
+          description: 待更新的用户字段
+          nullable: true
+      required:
+        - action
+    ChatHealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: 服务状态
+        message:
+          type: string
+          description: 状态说明
+        timestamp:
+          type: string
+          description: ISO 时间戳
+      required:
+        - status
+        - message
+        - timestamp
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+            - system
+            - user
+            - assistant
+          description: 消息角色
+          nullable: false
+        content:
+          type: string
+          description: 消息内容（1-32000 字符）
+          nullable: false
+      required:
+        - role
+        - content
+    ChatRequest:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                type: string
+                enum:
+                  - system
+                  - user
+                  - assistant
+                description: 消息角色
+                nullable: false
+              content:
+                type: string
+                description: 消息内容（1-32000 字符）
+                nullable: false
+            required:
+              - role
+              - content
+          description: 对话消息列表（1-50 条）
+          nullable: false
+        model:
+          type: string
+          description: 模型名称
+          nullable: true
+        temperature:
+          type: number
+          description: 采样温度 0-2
+          nullable: true
+        maxTokens:
+          type: number
+          description: 最大生成 token 数
+          nullable: true
+        stream:
+          type: boolean
+          description: 是否流式返回
+          nullable: true
+      required:
+        - messages
+    ChatResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 响应唯一 ID
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    enum:
+                      - system
+                      - user
+                      - assistant
+                    description: 消息角色
+                  content:
+                    type: string
+                    description: 消息内容（1-32000 字符）
+                required:
+                  - role
+                  - content
+                description: 助手回复消息
+              finish_reason:
+                type: string
+                description: 结束原因
+            required:
+              - message
+              - finish_reason
+          description: OpenAI 兼容 choices 结构
+        usage:
+          type: object
+          properties:
+            prompt_tokens:
+              type: number
+              description: 提示词 token 数
+            completion_tokens:
+              type: number
+              description: 生成 token 数
+            total_tokens:
+              type: number
+              description: 总 token 数
+          required:
+            - prompt_tokens
+            - completion_tokens
+            - total_tokens
+          description: token 用量
+        metadata:
+          type: object
+          properties:
+            responseTime:
+              type: number
+              description: 服务端处理耗时 ms
+            model:
+              type: string
+              description: 实际使用的模型
+            timestamp:
+              type: number
+              description: 服务端时间戳
+          required:
+            - responseTime
+            - model
+            - timestamp
+          description: 服务端元数据
+      required:
+        - id
+        - choices
+        - usage
+        - metadata
+    ChatRole:
+      type: string
+      enum:
+        - system
+        - user
+        - assistant
+    ChatUsage:
+      type: object
+      properties:
+        prompt_tokens:
+          type: number
+          description: 提示词 token 数
+        completion_tokens:
+          type: number
+          description: 生成 token 数
+        total_tokens:
+          type: number
+          description: 总 token 数
+      required:
+        - prompt_tokens
+        - completion_tokens
+        - total_tokens
+    DatabaseActionRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          description: >-
+            动作：connect | switch | close | save_history | save_favorite | delete_favorite | save_conversation |
+            update_conversation | query | transaction
+          nullable: false
+        data:
+          type: object
+          properties:
+            configName:
+              type: string
+              description: 配置名（connect）
+              nullable: true
+            connectionId:
+              type: string
+              description: 连接 ID（switch / close）
+              nullable: true
+            question:
+              type: string
+              description: 问题（save_history）
+              nullable: true
+            answer:
+              type: string
+              description: 答案（save_history）
+              nullable: true
+            category:
+              type: string
+              description: 分类
+              nullable: true
+            tags:
+              type: array
+              items:
+                type: string
+              description: 标签
+              nullable: true
+            title:
+              type: string
+              description: 标题（save_favorite / save_conversation）
+              nullable: true
+            content:
+              type: string
+              description: 内容（save_favorite）
+              nullable: true
+            type:
+              type: string
+              description: 收藏类型
+              nullable: true
+            id:
+              oneOf:
+                - type: number
+                - type: string
+              description: 收藏 ID（delete_favorite）
+              nullable: true
+            userId:
+              type: string
+              description: 用户 ID
+              nullable: true
+            messages:
+              type: array
+              items:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    enum:
+                      - system
+                      - user
+                      - assistant
+                    description: 消息角色
+                    nullable: false
+                  content:
+                    type: string
+                    description: 消息内容（1-32000 字符）
+                    nullable: false
+                required:
+                  - role
+                  - content
+              description: 消息列表（save_conversation）
+              nullable: true
+            updates:
+              type: object
+              additionalProperties: {}
+              description: 更新负载
+              nullable: true
+            sql:
+              type: string
+              description: SQL（query）
+              nullable: true
+            params:
+              type: array
+              items: {}
+              description: SQL 参数
+              nullable: true
+            operations:
+              type: array
+              items:
+                type: object
+                properties:
+                  sql:
+                    type: string
+                    nullable: false
+                  params:
+                    type: array
+                    items: {}
+                    nullable: true
+                required:
+                  - sql
+              description: 事务操作列表（transaction）
+              nullable: true
+          nullable: true
+      required:
+        - action
+    DatabaseDeleteQuery:
+      type: object
+      properties:
+        action:
+          type: string
+          description: favorite / connection
+        id:
+          type: string
+          description: 目标 ID，必填
+        userId:
+          type: string
+          description: 可选用户过滤
+      required:
+        - action
+        - id
+    DatabaseQuery:
+      type: object
+      properties:
+        action:
+          type: string
+          description: health / connections / history / search_history / favorites / conversations
+        userId:
+          type: string
+          description: 可选用户过滤
+        query:
+          type: string
+          description: search_history 时必填
+        limit:
+          type: number
+          description: history 分页，默认 50
+      required:
+        - action
+    DatabaseQueryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data: {}
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+    ImageAnalyzeInfoResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+          description: 支持的图片格式
+        supportedFormats:
+          type: array
+          items:
+            type: string
+          description: 支持的图片格式
+        maxSize:
+          type: string
+          description: 大小上限
+        features:
+          type: array
+          items:
+            type: string
+          description: 功能列表
+      required:
+        - status
+        - message
+        - supportedFormats
+        - maxSize
+        - features
+    ImageAnalyzeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          type: object
+          properties:
+            analysis:
+              type: string
+              description: AI 分析文本
+            imageInfo:
+              type: object
+              properties:
+                filename:
+                  type: string
+                  description: 文件名
+                type:
+                  type: string
+                  description: MIME 类型
+                size:
+                  type: number
+                  description: 大小 bytes
+                dimensions:
+                  type: string
+                  description: 尺寸描述
+              required:
+                - filename
+                - type
+                - size
+              description: 图片元信息
+            processedAt:
+              type: string
+              description: ISO 处理时间
+          required:
+            - analysis
+            - imageInfo
+            - processedAt
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+    OfflineProcessRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          description: 查询内容
+          nullable: true
+    OfflineTestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: 提示消息
+        offline:
+          type: boolean
+          description: 是否离线
+        timestamp:
+          type: string
+          description: ISO 时间戳
+        data:
+          type: object
+          properties:
+            searchResults:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 结果 ID
+                  title:
+                    type: string
+                    description: 标题
+                  description:
+                    type: string
+                    description: 描述
+                  url:
+                    type: string
+                    description: 链接
+                  type:
+                    type: string
+                    description: 类型
+                  relevance:
+                    type: number
+                    description: 相关度 0-1
+                  timestamp:
+                    type: string
+                    description: ISO 时间戳
+                required:
+                  - id
+                  - title
+                  - description
+                  - url
+                  - type
+                  - relevance
+                  - timestamp
+              description: 搜索结果
+            suggestions:
+              type: array
+              items:
+                type: string
+              description: 建议词
+            stats:
+              type: object
+              properties:
+                totalResults:
+                  type: number
+                  description: 总结果数
+                searchTime:
+                  type: number
+                  description: 搜索耗时秒
+                sources:
+                  type: array
+                  items:
+                    type: string
+                  description: 来源列表
+              required:
+                - totalResults
+                - searchTime
+                - sources
+              description: 统计
+          required:
+            - searchResults
+            - suggestions
+            - stats
+      required:
+        - message
+        - offline
+        - timestamp
+    PerformanceActionRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          description: 动作：optimize | clear_cache | process_file | batch_optimize_images | preload_resources
+          nullable: false
+        data:
+          type: object
+          properties:
+            file:
+              type: object
+              properties:
+                size:
+                  type: number
+                  nullable: true
+              description: 文件信息（process_file）
+              nullable: true
+            images:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    oneOf:
+                      - type: string
+                      - type: number
+                    nullable: true
+                  size:
+                    type: number
+                    nullable: true
+              description: 图片列表（batch_optimize_images）
+              nullable: true
+            optimizeOptions:
+              type: object
+              properties:
+                format:
+                  type: string
+                  nullable: true
+              description: 优化选项
+              nullable: true
+            urls:
+              type: array
+              items:
+                type: string
+              description: 预加载 URL 列表（preload_resources）
+              nullable: true
+          nullable: true
+      required:
+        - action
+    PerformanceQuery:
+      type: object
+      properties:
+        action:
+          type: string
+          description: report / memory / operation_stats / cache_stats
+        operation:
+          type: string
+          description: operation_stats 时必填
+      required:
+        - action
+    PerformanceReportResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          type: object
+          properties:
+            cacheStats:
+              type: object
+              additionalProperties: {}
+              description: 缓存统计
+            memoryUsage:
+              type: object
+              additionalProperties:
+                type: number
+              description: 内存用量
+            operationStats:
+              type: object
+              additionalProperties: {}
+              description: 操作统计
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+    SpeechToTextInfoResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+          description: 支持的音频格式
+        supportedFormats:
+          type: array
+          items:
+            type: string
+          description: 支持的音频格式
+        maxSize:
+          type: string
+          description: 大小上限
+        languages:
+          type: array
+          items:
+            type: string
+          description: 支持语言
+      required:
+        - status
+        - message
+        - supportedFormats
+        - maxSize
+        - languages
+    SpeechToTextResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          type: object
+          properties:
+            text:
+              type: string
+              description: 识别文本
+            confidence:
+              type: number
+              description: 置信度 0-1
+            language:
+              type: string
+              description: 语言代码
+            duration:
+              type: number
+              description: 估算时长秒
+            processedAt:
+              type: string
+              description: ISO 处理时间
+          required:
+            - text
+            - confidence
+            - language
+            - duration
+            - processedAt
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+    StreamChatRequest:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                type: string
+                enum:
+                  - system
+                  - user
+                  - assistant
+                description: 消息角色
+                nullable: false
+              content:
+                type: string
+                description: 消息内容（1-32000 字符）
+                nullable: false
+            required:
+              - role
+              - content
+          description: 对话消息列表
+          nullable: false
+        model:
+          type: string
+          description: 模型名称
+          nullable: true
+        temperature:
+          type: number
+          description: 采样温度
+          nullable: true
+        max_tokens:
+          type: number
+          description: 最大 token（snake_case 兼容）
+          nullable: true
+        stream:
+          type: boolean
+          description: 流式标记（恒为 true）
+          nullable: false
+      required:
+        - messages
+        - stream
+    SyncActionQuery:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: 设备 ID
+        action:
+          type: string
+          description: resolve_conflict / force_sync
+    SyncDataType:
+      type: string
+      enum:
+        - search_history
+        - favorites
+        - settings
+        - user_data
+    SyncDeleteQuery:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: 设备 ID
+        type:
+          type: string
+          enum:
+            - search_history
+            - favorites
+            - settings
+            - user_data
+          description: 可选，数据类型
+    SyncQuery:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: 设备 ID，默认 default
+        lastSync:
+          type: string
+          description: 增量同步起点 ISO 时间
+        type:
+          type: string
+          enum:
+            - search_history
+            - favorites
+            - settings
+            - user_data
+          description: search_history / favorites / settings / user_data
+    SyncRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - search_history
+            - favorites
+            - settings
+            - user_data
+          description: 数据类型
+          nullable: false
+        data:
+          type: object
+          additionalProperties: {}
+          description: 同步负载
+          nullable: false
+        timestamp:
+          type: string
+          description: ISO 客户端时间戳
+          nullable: false
+        deviceId:
+          type: string
+          description: 设备 ID
+          nullable: false
+      required:
+        - type
+        - data
+        - timestamp
+        - deviceId
+    SyncResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        synced:
+          type: number
+          description: 同步条数
+        conflicts:
+          type: number
+          description: 冲突数
+        lastSync:
+          type: string
+          description: ISO 最近同步
+        data:
+          type: object
+          additionalProperties: {}
+          description: 服务端数据（GET）
+        error:
+          type: string
+          description: 错误信息
+      required:
+        - success
+        - synced
+        - conflicts
+        - lastSync
+    SystemStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: 总体状态
+        timestamp:
+          type: string
+          description: ISO 时间戳
+        responseTime:
+          type: number
+          description: 本次检查耗时 ms
+        services:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              status:
+                type: string
+                description: 单服务状态
+              responseTime:
+                type: number
+                description: 响应耗时 ms
+              lastCheck:
+                type: string
+                description: ISO 最近检查
+              details:
+                type: string
+                description: 详情
+            required:
+              - status
+              - responseTime
+              - lastCheck
+          description: 各服务状态映射
+        system:
+          type: object
+          properties:
+            uptime:
+              type: number
+              description: 进程运行秒数
+            memory:
+              type: object
+              additionalProperties:
+                type: number
+              description: 内存使用
+            cpu:
+              type: object
+              properties:
+                usage:
+                  type: number
+                  description: 使用率 %
+                cores:
+                  type: number
+                  description: 核心数
+              required:
+                - usage
+                - cores
+              description: CPU 信息
+            version:
+              type: string
+              description: Node 版本
+            platform:
+              type: string
+              description: 平台
+          required:
+            - uptime
+            - memory
+            - cpu
+            - version
+            - platform
+          description: 系统指标
+        summary:
+          type: object
+          properties:
+            totalServices:
+              type: number
+              description: 服务总数
+            healthyServices:
+              type: number
+              description: 健康数
+            degradedServices:
+              type: number
+              description: 降级数
+            downServices:
+              type: number
+              description: 宕机数
+            averageResponseTime:
+              type: number
+              description: 平均响应 ms
+          required:
+            - totalServices
+            - healthyServices
+            - degradedServices
+            - downServices
+            - averageResponseTime
+          description: 汇总
+        endpoints:
+          type: object
+          additionalProperties:
+            type: string
+          description: 端点地图
+      required:
+        - status
+        - timestamp
+        - responseTime
+        - services
+        - system
+        - summary
+        - endpoints
+    UploadInfoResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: 服务状态
+        message:
+          type: string
+          description: 状态说明
+        supportedTypes:
+          type: array
+          items:
+            type: string
+          description: 支持的 MIME 列表
+        maxSize:
+          type: string
+          description: 大小上限描述
+      required:
+        - status
+        - message
+        - supportedTypes
+        - maxSize
+    UploadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: 上传记录 ID
+            filename:
+              type: string
+              description: 存储文件名
+            originalName:
+              type: string
+              description: 原始文件名
+            type:
+              type: string
+              description: MIME 类型
+            size:
+              type: number
+              description: 文件大小 bytes
+            extractedText:
+              type: string
+              description: 提取的文本内容
+            analysis:
+              type: string
+              description: 分析摘要
+            uploadedAt:
+              type: string
+              description: ISO 上传时间
+          required:
+            - id
+            - filename
+            - originalName
+            - type
+            - size
+            - extractedText
+            - analysis
+            - uploadedAt
+        message:
+          type: string
+          description: 附加消息
+        error:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  description: 错误类型标识
+                message:
+                  type: string
+                  description: 用户可读错误信息
+                id:
+                  type: string
+                  description: 错误唯一 ID（链路追踪）
+                details:
+                  type: string
+                  description: 调试详情
+              required:
+                - type
+                - message
+            - type: string
+          description: 失败时的错误结构
+  responses: {}
+paths:
+  /ai:
+    get:
+      operationId: get-ai
+      summary: ''
+      description: ''
+      tags:
+        - Ai
+      parameters:
+        - in: query
+          name: action
+          required: true
+          schema:
+            type: string
+            description: status / providers / current_provider / test_provider / health
+          description: status / providers / current_provider / test_provider / health
+          example: example
+        - in: query
+          name: provider
+          required: false
+          schema:
+            type: string
+            description: test_provider 时必填
+          description: test_provider 时必填
+          example: example
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIStatusResponse'
+    post:
+      operationId: post-ai
+      summary: ''
+      description: ''
+      tags:
+        - Ai
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIResponse'
+    put:
+      operationId: put-ai
+      summary: ''
+      description: ''
+      tags:
+        - Ai
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIConfigUpdate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEnvelope'
+  /analyze-image:
+    get:
+      operationId: get-analyze-image
+      summary: ''
+      description: ''
+      tags:
+        - Analyze-image
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageAnalyzeInfoResponse'
+    post:
+      operationId: post-analyze-image
+      summary: ''
+      description: ''
+      tags:
+        - Analyze-image
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageAnalyzeResponse'
+  /auth:
+    get:
+      operationId: get-auth
+      summary: ''
+      description: ''
+      tags:
+        - Auth
+      parameters:
+        - in: query
+          name: action
+          required: true
+          schema:
+            type: string
+            description: current_user / verify_email
+          description: current_user / verify_email
+          example: example
+        - in: query
+          name: token
+          required: false
+          schema:
+            type: string
+            description: verify_email 时必填
+          description: verify_email 时必填
+          example: example
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+    post:
+      operationId: post-auth
+      summary: ''
+      description: ''
+      tags:
+        - Auth
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+    put:
+      operationId: put-auth
+      summary: ''
+      description: ''
+      tags:
+        - Auth
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthUpdate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /chat:
+    get:
+      operationId: get-chat
+      summary: ''
+      description: ''
+      tags:
+        - Chat
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatHealthResponse'
+    post:
+      operationId: post-chat
+      summary: ''
+      description: ''
+      tags:
+        - Chat
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+  /chat/stream:
+    get:
+      operationId: get-chat-stream
+      summary: ''
+      description: ''
+      tags:
+        - Chat
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEnvelope'
+    post:
+      operationId: post-chat-stream
+      summary: ''
+      description: ''
+      tags:
+        - Chat
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamChatRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEnvelope'
+  /database:
+    get:
+      operationId: get-database
+      summary: ''
+      description: ''
+      tags:
+        - Database
+      parameters:
+        - in: query
+          name: action
+          required: true
+          schema:
+            type: string
+            description: health / connections / history / search_history / favorites / conversations
+          description: health / connections / history / search_history / favorites / conversations
+          example: example
+        - in: query
+          name: userId
+          required: false
+          schema:
+            type: string
+            description: 可选用户过滤
+          description: 可选用户过滤
+          example: '123'
+        - in: query
+          name: query
+          required: false
+          schema:
+            type: string
+            description: search_history 时必填
+          description: search_history 时必填
+          example: example
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: number
+            description: history 分页，默认 50
+          description: history 分页，默认 50
+          example: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseQueryResponse'
+    post:
+      operationId: post-database
+      summary: ''
+      description: ''
+      tags:
+        - Database
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatabaseActionRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseQueryResponse'
+    delete:
+      operationId: delete-database
+      summary: ''
+      description: ''
+      tags:
+        - Database
+      parameters:
+        - in: query
+          name: action
+          required: true
+          schema:
+            type: string
+            description: favorite / connection
+          description: favorite / connection
+          example: example
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+            description: 目标 ID，必填
+          description: 目标 ID，必填
+          example: '123'
+        - in: query
+          name: userId
+          required: false
+          schema:
+            type: string
+            description: 可选用户过滤
+          description: 可选用户过滤
+          example: '123'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseQueryResponse'
+  /performance:
+    get:
+      operationId: get-performance
+      summary: ''
+      description: ''
+      tags:
+        - Performance
+      parameters:
+        - in: query
+          name: action
+          required: true
+          schema:
+            type: string
+            description: report / memory / operation_stats / cache_stats
+          description: report / memory / operation_stats / cache_stats
+          example: example
+        - in: query
+          name: operation
+          required: false
+          schema:
+            type: string
+            description: operation_stats 时必填
+          description: operation_stats 时必填
+          example: example
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceReportResponse'
+    post:
+      operationId: post-performance
+      summary: ''
+      description: ''
+      tags:
+        - Performance
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerformanceActionRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceReportResponse'
+  /speech-to-text:
+    get:
+      operationId: get-speech-to-text
+      summary: ''
+      description: ''
+      tags:
+        - Speech-to-text
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpeechToTextInfoResponse'
+    post:
+      operationId: post-speech-to-text
+      summary: ''
+      description: ''
+      tags:
+        - Speech-to-text
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpeechToTextResponse'
+  /status:
+    get:
+      operationId: get-status
+      summary: ''
+      description: ''
+      tags:
+        - Status
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatusResponse'
+    post:
+      operationId: post-status
+      summary: ''
+      description: ''
+      tags:
+        - Status
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEnvelope'
+  /sync:
+    get:
+      operationId: get-sync
+      summary: ''
+      description: ''
+      tags:
+        - Sync
+      parameters:
+        - in: query
+          name: deviceId
+          required: false
+          schema:
+            type: string
+            description: 设备 ID，默认 default
+          description: 设备 ID，默认 default
+          example: '123'
+        - in: query
+          name: lastSync
+          required: false
+          schema:
+            type: string
+            description: 增量同步起点 ISO 时间
+          description: 增量同步起点 ISO 时间
+          example: example
+        - in: query
+          name: type
+          required: false
+          schema:
+            type: string
+            enum:
+              - search_history
+              - favorites
+              - settings
+              - user_data
+            description: search_history / favorites / settings / user_data
+          description: search_history / favorites / settings / user_data
+          example: search_history
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+    post:
+      operationId: post-sync
+      summary: ''
+      description: ''
+      tags:
+        - Sync
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+    put:
+      operationId: put-sync
+      summary: ''
+      description: ''
+      tags:
+        - Sync
+      parameters:
+        - in: query
+          name: deviceId
+          required: false
+          schema:
+            type: string
+            description: 设备 ID
+          description: 设备 ID
+          example: '123'
+        - in: query
+          name: action
+          required: false
+          schema:
+            type: string
+            description: resolve_conflict / force_sync
+          description: resolve_conflict / force_sync
+          example: example
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+    delete:
+      operationId: delete-sync
+      summary: ''
+      description: ''
+      tags:
+        - Sync
+      parameters:
+        - in: query
+          name: deviceId
+          required: false
+          schema:
+            type: string
+            description: 设备 ID
+          description: 设备 ID
+          example: '123'
+        - in: query
+          name: type
+          required: false
+          schema:
+            type: string
+            enum:
+              - search_history
+              - favorites
+              - settings
+              - user_data
+            description: 可选，数据类型
+          description: 可选，数据类型
+          example: search_history
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+  /test-offline:
+    get:
+      operationId: get-test-offline
+      summary: ''
+      description: ''
+      tags:
+        - Test-offline
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflineTestResponse'
+    post:
+      operationId: post-test-offline
+      summary: ''
+      description: ''
+      tags:
+        - Test-offline
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineProcessRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEnvelope'
+  /upload:
+    get:
+      operationId: get-upload
+      summary: ''
+      description: ''
+      tags:
+        - Upload
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadInfoResponse'
+    post:
+      operationId: post-upload
+      summary: ''
+      description: ''
+      tags:
+        - Upload
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+tags:
+  - name: Ai
+  - name: Analyze-image
+  - name: Auth
+  - name: Chat
+  - name: Database
+  - name: Performance
+  - name: Speech-to-text
+  - name: Status
+  - name: Sync
+  - name: Test-offline
+  - name: Upload
