@@ -5,6 +5,26 @@ YYC³ NovaMind 所有重要更改均记录在此文件中。
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased]
+
+### 安全
+
+- **依赖漏洞治理**：`pnpm audit` 23 项（2 critical / 10 high / 8 moderate / 3 low）→ **4 项**（2 low / 2 moderate，均为 devDeps 且需主版本升级），**生产依赖 0 漏洞**
+  - 工具链升级：vitest 2.1.9 → 3.2.7、@vitest/coverage-v8 → 3.2.7、happy-dom 15 → 20.14.5（修复 vitest/happy-dom 双 critical）
+  - `pnpm.overrides` 收敛传递依赖：vite ^6.4.3、postcss ^8.5.28、nanoid ^3.3.18、glob ^10.5.0、browserslist ^4.28.7、esbuild ^0.25.0、jsondiffpatch ^0.7.6 等
+  - 全链路验证零回归：typecheck 0 / lint 0 error / 111 测试 / 覆盖率门禁 / 契约同源 / build
+
+### 新增（P0 三项闭环）
+
+- **核心域测试**：`lib/__tests__/` 7 文件 95 用例（总数 16 → 111），核心域覆盖率 auth 63.5% / conversation 82% / assessment 90% / ratings 93% / favorites 94% / mindmap 93% / local-llm-config 98%
+- **覆盖率双轨门禁**：vitest 口径校准为 lib+hooks 单测职责域；全局棘轮阈值 + 核心域逐文件硬门禁（60-95%）
+- **ESLint flat config**：`eslint.config.mjs`（eslint-config-next 16 原生导出，弃用 FlatCompat）+ `pnpm lint` + CI 0 error 门禁恢复
+- **Sentry 监控**：DSN 驱动双端 instrumentation（`instrumentation.ts` / `instrumentation-client.ts`）+ 错误边界上报 + `.env.example` 模板（gitignore 例外入库）
+
+### 修复（P0 会话）
+
+- `bundle-optimizer.ts` `module` 保留字变量、`use-toast.ts`×2 死代码、`chat/stream/route.ts` 未用变量
+
 ## [2.0.0] - 2026-09-18
 
 ### 新增
