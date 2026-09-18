@@ -36,8 +36,8 @@ jobs:
           cache-dependency-path: docs/YYC3-Docs/requirements-dev.txt
 
       - name: 📦 Install MkDocs toolchain
-        working-directory: docs/YYC3-Docs
-        run: pip install -r requirements-dev.txt
+        # 最小化安装：requirements-dev.txt 含 gitleaks（Go 工具）等非 PyPI 项，构建仅需 material + minify
+        run: pip install mkdocs-material==9.5.39 mkdocs-minify-plugin==0.8.0
 
       - name: 🏗️ Build MkDocs site
         working-directory: docs/YYC3-Docs
