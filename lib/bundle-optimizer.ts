@@ -216,14 +216,14 @@ export class BundleOptimizer {
     let savings = 0
 
     // 分析每个模块的导入/导出使用情况
-    for (const module of stats.modules) {
-      if (module.isUsed) {
+    for (const mod of stats.modules) {
+      if (mod.isUsed) {
         // 计算未使用的导出
-        const unusedExports = module.exports.length - module.imports.length
+        const unusedExports = mod.exports.length - mod.imports.length
         if (unusedExports > 0) {
           // 估算可以通过tree shaking节省的大小
-          const unusedRatio = unusedExports / module.exports.length
-          savings += module.size * unusedRatio * 0.3 // 保守估计30%可以被移除
+          const unusedRatio = unusedExports / mod.exports.length
+          savings += mod.size * unusedRatio * 0.3 // 保守估计30%可以被移除
         }
       }
     }

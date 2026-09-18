@@ -75,9 +75,8 @@ jobs:
       - name: 🧪 TypeScript 编译门禁
         run: pnpm typecheck
 
-      # Next 16 已移除 next lint 命令，ESLint 门禁由 standalone eslint 接管（待配置 flat config 后启用）
-      # - name: 🔎 ESLint 代码规范
-      #   run: pnpm lint
+      - name: 🔎 ESLint 代码规范（flat config · 0 error 门禁）
+        run: pnpm lint
 
       - name: 📑 OpenAPI 契约同步门禁
         run: |

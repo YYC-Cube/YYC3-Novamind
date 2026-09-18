@@ -127,10 +127,7 @@ def solve_problem():
   const words = fullResponse.split("")
 
   // 模拟打字效果
-  let currentText = ""
   for (let i = 0; i < words.length; i++) {
-    currentText += words[i]
-
     yield {
       id: `chatcmpl-${Date.now()}`,
       object: "chat.completion.chunk",

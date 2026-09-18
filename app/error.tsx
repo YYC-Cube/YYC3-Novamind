@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AlertTriangle, RefreshCw, Home } from "lucide-react"
 import { useRouter } from "next/navigation"
+import * as Sentry from "@sentry/nextjs"
 
 export default function Error({
   error,
@@ -16,7 +17,8 @@ export default function Error({
   const router = useRouter()
 
   useEffect(() => {
-    // 记录错误到监控服务
+    // 记录错误到监控服务（Sentry 未配置 DSN 时为 no-op）
+    Sentry.captureException(error)
     console.error("应用错误:", error)
   }, [error])
 
