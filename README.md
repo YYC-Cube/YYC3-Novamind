@@ -169,7 +169,7 @@ yyc3-novamind/
 ```bash
 # 克隆项目
 git clone https://github.com/YYC-Cube/YYC3-Novamind.git
-cd yyc3-novamind
+cd YYC3-Novamind
 
 # 安装依赖
 pnpm install
