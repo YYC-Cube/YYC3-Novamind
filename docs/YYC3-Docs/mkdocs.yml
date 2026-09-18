@@ -1,9 +1,9 @@
 site_name: YYC³ · Generative AI Prompt Engineering
 site_description: "YANYUCLOUDCUBE 生成式人工智能提示词工程体系 — 00至13 全系列 465+ 文档 · Five Dimensions · Five-High/Five-Standard/Five-Transformation"
 site_author: "Yanyu Intelligent Technology Co., Ltd."
-site_url: "https://yanyucloudcube.github.io/YYC3-Prompt-Engineering"
-repo_url: "https://github.com/YanYuCloudCube/YYC3-Prompt-Engineering"
-repo_name: "YYC3-Prompt-Engineering"
+site_url: "https://zy.yyc3.vip"
+repo_url: "https://github.com/YYC-Cube/YYC3-Novamind"
+repo_name: "YYC-Cube/YYC3-Novamind"
 copyright: "© 2025-2026 言语（河南）智能科技有限公司 · ® YANYUCLOUDCUBE"
 
 theme:

@@ -1,0 +1,63 @@
+name: 🌐 Pages Deploy（zy.yyc3.vip）
+
+# YYC³-Docs 文档站 → GitHub Pages（自定义域名 zy.yyc3.vip）
+# 触发：docs/YYC3-Docs 或本 workflow 变更推送 main；支持手动触发
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/YYC3-Docs/**'
+      - '.github/workflows/pages-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间仅一个部署，排队中的取消旧的
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: docs/YYC3-Docs/requirements.txt
+
+      - name: 📦 Install MkDocs
+        working-directory: docs/YYC3-Docs
+        run: pip install -r requirements.txt
+
+      - name: 🏗️ Build MkDocs site
+        working-directory: docs/YYC3-Docs
+        run: mkdocs build --site-dir ../../_site --strict
+
+      - name: 🌐 Inject CNAME
+        run: echo 'zy.yyc3.vip' > _site/CNAME
+
+      - name: 📤 Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: https://zy.yyc3.vip
+    steps:
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
