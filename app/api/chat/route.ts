@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
         content: msg.content,
       })),
       temperature,
-      maxTokens,
+      // AI SDK v5: maxTokens 已更名为 maxOutputTokens（外部 API 契约字段名保持 maxTokens）
+      maxOutputTokens: maxTokens,
     })
 
     const responseTime = Date.now() - startTime
@@ -57,8 +58,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       usage: {
-        prompt_tokens: usage?.promptTokens ?? 0,
-        completion_tokens: usage?.completionTokens ?? 0,
+        prompt_tokens: usage?.inputTokens ?? 0,
+        completion_tokens: usage?.outputTokens ?? 0,
         total_tokens: usage?.totalTokens ?? 0,
       },
       metadata: {

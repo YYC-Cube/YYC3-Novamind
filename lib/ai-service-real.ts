@@ -296,10 +296,19 @@ export class RealAIService {
         content: m.content,
       })),
       temperature: options.temperature || config.temperature,
-      maxTokens: options.maxTokens || config.maxTokens,
+      maxOutputTokens: options.maxTokens || config.maxTokens,
     })
 
-    return { text, usage, finishReason }
+    // AI SDK v5: usage 字段改名 inputTokens/outputTokens
+    return {
+      text,
+      usage: {
+        promptTokens: usage.inputTokens ?? 0,
+        completionTokens: usage.outputTokens ?? 0,
+        totalTokens: usage.totalTokens ?? 0,
+      },
+      finishReason,
+    }
   }
 
   private static async streamOpenAI(
@@ -315,7 +324,7 @@ export class RealAIService {
         content: m.content,
       })),
       temperature: options.temperature || config.temperature,
-      maxTokens: options.maxTokens || config.maxTokens,
+      maxOutputTokens: options.maxTokens || config.maxTokens,
     })
 
     for await (const chunk of textStream) {
@@ -325,10 +334,15 @@ export class RealAIService {
       })
     }
 
+    const finalUsage = await usage
     onChunk({
       content: "",
       isComplete: true,
-      usage: await usage,
+      usage: {
+        promptTokens: finalUsage.inputTokens ?? 0,
+        completionTokens: finalUsage.outputTokens ?? 0,
+        totalTokens: finalUsage.totalTokens ?? 0,
+      },
     })
   }
 
