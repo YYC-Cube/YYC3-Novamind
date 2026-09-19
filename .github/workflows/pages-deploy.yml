@@ -1,13 +1,13 @@
-name: 🌐 Pages Deploy（zy.yyc3.vip）
+name: 🌐 Pages Deploy（zy.yyc3.top）
 
-# YYC³-Docs 文档站 → GitHub Pages（自定义域名 zy.yyc3.vip）
-# 触发：docs/YYC3-Docs 或本 workflow 变更推送 main；支持手动触发
+# YYC³ NovaMind 项目落地页 → GitHub Pages
+# 触发：landing page 源或本 workflow 变更推送 main；支持手动触发
 
 on:
   push:
     branches: [main]
     paths:
-      - "docs/YYC3-Docs/**"
+      - "landing/**"
       - ".github/workflows/pages-deploy.yml"
   workflow_dispatch:
 
@@ -28,23 +28,22 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-          cache-dependency-path: docs/YYC3-Docs/requirements-dev.txt
-
-      - name: 📦 Install MkDocs toolchain
-        # 最小化安装：requirements-dev.txt 含 gitleaks（Go 工具）等非 PyPI 项，构建仅需 material + minify
-        run: pip install mkdocs-material==9.5.39 mkdocs-minify-plugin==0.8.0
-
-      - name: 🏗️ Build MkDocs site
-        working-directory: docs/YYC3-Docs
-        run: mkdocs build --site-dir ../../_site --strict
-
       - name: 🌐 Inject CNAME
-        run: echo 'zy.yyc3.vip' > _site/CNAME
+        run: echo 'zy.yyc3.top' > _site/CNAME 2>/dev/null || (mkdir -p _site && echo 'zy.yyc3.top' > _site/CNAME)
+
+      - name: 🏗️ Assemble landing site
+        run: |
+          mkdir -p _site
+          # 落地页主体（单文件，零构建依赖）
+          cp landing/index.html _site/
+          # 品牌资产
+          mkdir -p _site/assets
+          cp public/yyc3-Family.png _site/assets/
+          cp public/interconnected-tech.png _site/assets/
+          cp public/yyc3-icons/Web\ App/android-chrome-512.png _site/assets/icon-maskable-512.png 2>/dev/null || true
+          # README 徽章引用的项目级文档资产（OpenAPI 契约展示）
+          mkdir -p _site/docs
+          cp public/docs/openapi.generated.yaml _site/docs/ 2>/dev/null || true
 
       - name: 📤 Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -56,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: https://zy.yyc3.vip
+      url: https://zy.yyc3.top
     steps:
       - name: 🚀 Deploy to GitHub Pages
         id: deployment

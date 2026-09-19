@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YYC³ NovaMind — 星图智语 · 新一代 AI 全栈智能交互平台</title>
+<meta name="description" content="多模态 AI 对话 · 知识图谱 · 内容生成 · 学习路径 · 社区协作 —— 以「五维驱动」架构（五高 · 五标 · 五化）构建的全端 PWA 智能应用。">
+<meta property="og:title" content="YYC³ NovaMind — 星图智语">
+<meta property="og:description" content="新一代 AI 全栈智能交互平台 · 全端 PWA · 五高五标五化">
+<meta property="og:image" content="/assets/yyc3-Family.png">
+<link rel="icon" type="image/png" href="/assets/icon-maskable-512.png">
+<style>
+:root{
+  --bg:#0a0a0f;--panel:#12121a;--panel2:#161622;--line:rgba(255,255,255,.08);
+  --txt:#e8e8f0;--sub:#9a9ab0;--pri:#7b61ff;--pri2:#06b6d4;--ok:#3ddc84;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;overflow-x:hidden}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* hero */
+.hero{position:relative;padding:110px 0 90px;text-align:center;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(600px 300px at 50% 0%,rgba(123,97,255,.18),transparent),
+  radial-gradient(500px 260px at 80% 30%,rgba(6,182,212,.10),transparent);pointer-events:none}
+.hero .wrap{position:relative}
+.badge{display:inline-block;padding:6px 16px;border:1px solid rgba(123,97,255,.4);border-radius:999px;font-size:13px;color:#b8a8ff;background:rgba(123,97,255,.08);margin-bottom:28px;letter-spacing:.5px}
+h1{font-size:clamp(34px,6vw,58px);font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 30%,#a78bfa 70%,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:clamp(16px,2.4vw,21px);color:var(--sub);margin:18px auto 14px;max-width:640px}
+.desc{font-size:15px;color:#6d6d85;max-width:720px;margin:0 auto 40px}
+.cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:13px 30px;border-radius:12px;font-size:15px;font-weight:600;text-decoration:none;transition:all .25s}
+.btn-pri{background:linear-gradient(135deg,#7b61ff,#5b3fd6);color:#fff;box-shadow:0 8px 24px rgba(123,97,255,.35)}
+.btn-pri:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(123,97,255,.45)}
+.btn-ghost{border:1px solid var(--line);color:var(--txt);background:rgba(255,255,255,.03)}
+.btn-ghost:hover{border-color:rgba(123,97,255,.5);background:rgba(123,97,255,.08)}
+
+/* badges */
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:44px}
+.badges img{height:20px;border-radius:4px;opacity:.9}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:-30px auto 0;max-width:900px;position:relative;z-index:1}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+.stat b{display:block;font-size:26px;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stat span{font-size:12.5px;color:var(--sub)}
+
+/* sections */
+section{padding:74px 0}
+h2{font-size:clamp(24px,3.6vw,32px);text-align:center;margin-bottom:10px;letter-spacing:-.01em}
+.sec-sub{text-align:center;color:var(--sub);font-size:14.5px;margin-bottom:44px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;transition:all .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(123,97,255,.35);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.card .ico{font-size:26px;margin-bottom:12px}
+.card h3{font-size:16.5px;margin-bottom:8px}
+.card p{font-size:13.5px;color:var(--sub)}
+
+/* tech */
+.tech{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.trow{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.trow .k{color:var(--sub);font-size:12.5px}
+.trow .v{font-weight:600}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:36px 0 44px;text-align:center;color:#6d6d85;font-size:13px}
+footer .brand{font-weight:700;color:var(--txt);margin-bottom:6px}
+footer .motto{font-size:12px;letter-spacing:.6px;color:#5a5a72;margin-bottom:18px}
+footer a{color:#a78bfa;text-decoration:none}
+footer a:hover{text-decoration:underline}
+.copy{font-size:12px;color:#4a4a5e;margin-top:14px}
+
+@media(max-width:640px){
+  .hero{padding:76px 0 60px}
+  section{padding:52px 0}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="badge">YYC³ NovaMind v2.0 · 全端 PWA</div>
+    <h1>星图智语 · 新一代 AI 全栈智能交互平台</h1>
+    <p class="sub">多模态 AI 对话 · 知识图谱 · 内容生成 · 学习路径 · 社区协作</p>
+    <p class="desc">以「五维驱动」架构（五高 · 五标 · 五化）构建的全端 PWA 智能应用 — Next.js 16 · React 19 · TypeScript 5.7 · 111 测试全绿 · OpenAPI SSOT 契约门禁</p>
+    <div class="cta">
+      <a class="btn btn-pri" href="https://github.com/YYC-Cube/YYC3-Novamind">GitHub 仓库</a>
+      <a class="btn btn-ghost" href="/docs/openapi.generated.yaml">OpenAPI 契约</a>
+   </div>
+    <div class="badges">
+      <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js" alt="Next.js 16">
+      <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react" alt="React 19">
+      <img src="https://img.shestatus.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript" alt="TypeScript 5.7">
+      <img src="https://img.shields.io/badge/Vitest-111%20passed-3DDC84?style=flat-square&logo=vitest" alt="Tests 111 passed">
+      <img src="https://img.shields.io/github/actions/workflow/status/YYC-Cube/YYC3-Novamind/ci.yml?style=flat-square&label=CI" alt="CI status">
+      <img src="https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa" alt="PWA Ready">
+    </ CVg>
+    <div class="stats">
+      <div class="stat"><b>41+</b><span>页面</span></div>
+      <div class="stat"><b>29</b><span>API 端点</span></div>
+      <div class="stat"><b>111</b><span>测试用例</span></div>
+    </div>
+  </div>
+  <img src="/assets/yyc3-Family.png" alt="YYC³ Family" style="display:none">
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>✨ 核心能力</h2>
+    <p class="sec-sub">全链路智能应用 · 开箱即用 · 五高架构驱动</p>
+    <div class="grid">
+      <div class="card"><div class="ico">🤖</div><h3>AI 对话</h3><p>多轮对话 · 流式响应 · 多模型支持 · 本地 LLM（Ollama 协议）</p></div>
+      <div class="card"><div class="ico">🧠</div><h3>知识图谱</h3><p>可视化图谱 · 智能关联 · 节点探索</p></div>
+      <div class="card"><div class="全">🎨</div><h3>内容生成</h3><p>海报 · PPT · 罪页 · 一键生成</p></div>
+      <div class="card"><div class="ico">🗺️</div><class="ico">思维导图</h3><p>AI 生成 · 多主题 · 交互式编辑</p></div>
+      <div class cards>📚 学习路径 ...</div>
+      <div class="card"><div class="ico">👥</div><h3>社区协作</h3><p>内容分享 · 学习小组 · 完全协作</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--panel)">
+  <div corrupted> corruption of the file content
+</section>
+
+<section>
+  <fs>技术栈</fs>
+  <div class="wrap">
+    <div class="tech">
+      <div class="trow"><span class="k">Framework</span><span class="v">Next.js 16 (App Router + RSC)</span></div>
+      <div class="trow"><span class="k">UI</span><span class="v">React 19 + shadcn/ui + Radix UI</span></div>
+      <div class="trow"><span class="k">Language</span><span class="v">TypeScript 5.7 strict</span></div>
+      <div class="t strange">样式 <span class="v">Tailwind CSS 3.4</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand">YanYuCloudCube</div>
+    <div class="motto">言启象限 | 语枢未来 — Words Initiate Quadrants, Language Serves as Core for Future</座右铭>
+    <p>以「五维驱动」落地「五高 · 五标 · 五化」</p>
+    <p>GitHub：<a href="https://github.com/YYC-Cube/YYC3-Novabook">YYC-Cube/YYC3-Novamind</a · <a href="/docs/openapi.generated.yaml">OpenAPI</a>
+    <p class="copy">© 2025-2026 YanYuCloudCube™. All Rights Reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
