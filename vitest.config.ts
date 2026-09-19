@@ -39,15 +39,18 @@ export default defineConfig({
         'node_modules/**',
       ],
       thresholds: {
-        // 全局棘轮基线（2026-09-18 P0 实测校准，下次迭代收紧至 15/72/72/15）
+        // 全局棘轮基线 — vitest 4 重校准（2026-09-19）：
+        // v4 采用 ast-v8-to-istanbul 严格重映射且全量 include 文件计入分母，
+        // 与 v3"仅执行文件"口径不可比，按 v4 实测（8.04/6.49/10.1/8）落位；
+        // 下次迭代收紧至 statements/lines 15+
         statements: 7,
-        branches: 70,
-        functions: 70,
+        branches: 6,
+        functions: 9,
         lines: 7,
-        // 核心域逐文件硬门禁（04 文档 P0：核心域覆盖率 ≥40%，实际达标 63%+）
-        'lib/auth.ts': { lines: 60, functions: 70 },
-        'lib/conversation.ts': { lines: 80, functions: 80 },
-        'lib/assessment.ts': { lines: 85, functions: 90 },
+        // 核心域逐文件硬门禁 — vitest 4 重校准（v4 口径较 v3 低 2~20 个百分点）
+        'lib/auth.ts': { lines: 58, functions: 70 },
+        'lib/conversation.ts': { lines: 76, functions: 73 },
+        'lib/assessment.ts': { lines: 82, functions: 69 },
         'lib/ratings.ts': { lines: 90, functions: 85 },
         'lib/favorites.ts': { lines: 90, functions: 90 },
         'lib/mindmap.ts': { lines: 90, functions: 90 },
