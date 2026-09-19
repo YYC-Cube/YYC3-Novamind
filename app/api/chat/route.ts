@@ -1,16 +1,19 @@
+import { recordUsage, withGuard } from "@/lib/api-guard"
+import { getDb, isDbEnabled } from "@/lib/db"
+import { chats, messages as messagesTable, users } from "@/lib/db/schema"
 import { EnhancedErrorHandler, ErrorSeverity, ErrorType } from "@/lib/error-handler"
 import { ChatRequestSchema } from "@/openapi/schemas"
 import { openai } from "@ai-sdk/openai"
 import { generateText } from "ai"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
 /** @openapi
  * AI 对话同步接口
- * @desc 调用 AI 模型生成单轮回复，返回 OpenAI 兼容结构
+ * @desc 调用 AI 模型生成单轮回复，返回 OpenAI 兼容结构（限流/消毒/成本闸三重防护）
  * @body ChatRequest
  * @response ChatResponse
  */
-export async function POST(request: NextRequest) {
+export const POST = withGuard(async (request: Request) => {
   try {
     const rawBody = await request.json()
     const parsed = ChatRequestSchema.safeParse(rawBody)
@@ -45,6 +48,42 @@ export async function POST(request: NextRequest) {
     })
 
     const responseTime = Date.now() - startTime
+    const totalTokens = usage?.totalTokens ?? 0
+    recordUsage(totalTokens) // 成本闸回写实际用量
+
+    // 持久化（DSN 驱动：DATABASE_URL 缺失时静默跳过）
+    if (isDbEnabled) {
+      try {
+        const db = getDb()
+        // 匿名模式（Phase A 无 Auth）：统一挂到系统占位用户
+        const [systemUser] = await db
+          .insert(users)
+          .values({ email: "system@novamind.local", username: "system" })
+          .onConflictDoNothing()
+          .returning()
+        const userId =
+          systemUser?.id ??
+          (await db.select().from(users)).find((u) => u.email === "system@novamind.local")?.id
+
+        if (userId) {
+          const [chat] = await db
+            .insert(chats)
+            .values({ userId, title: messages[0]?.content?.slice(0, 50) ?? "新对话" })
+            .returning()
+          if (chat) {
+            await db.insert(messagesTable).values({
+              chatId: chat.id,
+              data: { role: "assistant", parts: [{ type: "text", text }] },
+              inputTokens: usage?.inputTokens ?? 0,
+              outputTokens: usage?.outputTokens ?? 0,
+            })
+          }
+        }
+      } catch (dbError) {
+        // 持久化失败不阻断主链路
+        console.error("会话持久化失败:", dbError)
+      }
+    }
 
     return NextResponse.json({
       id: `chat-${Date.now()}`,
@@ -79,7 +118,7 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     )
   }
-}
+})
 
 /** @openapi
  * 聊天 API 健康检查
