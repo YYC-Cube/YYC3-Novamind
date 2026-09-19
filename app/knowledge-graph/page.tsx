@@ -754,7 +754,7 @@ export default function KnowledgeGraphPage() {
       {showConnectionSuggestions && selectedNode && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[70vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">为 "{selectedNode.title}" 建立连接</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">为 &quot;{selectedNode.title}&quot; 建立连接</h3>
 
             {connectionSuggestions.length === 0 ? (
               <p className="text-gray-600 text-center py-4">暂无连接建议</p>

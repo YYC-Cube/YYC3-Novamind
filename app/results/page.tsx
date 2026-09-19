@@ -284,7 +284,7 @@ ${query}是一个多维度的概念，涉及理论基础、实践应用和未来
 
         {/* 交互提示 */}
         <div className="text-center text-gray-400 text-sm">
-          <p>上下滑动切换章节 • 语音说"下一个"或"上一个" • 左边缘点击返回</p>
+          <p>上下滑动切换章节 • 语音说&quot;下一个&quot;或&quot;上一个&quot; • 左边缘点击返回</p>
         </div>
       </div>
 

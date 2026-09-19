@@ -193,56 +193,77 @@ export class RealAIService {
       model?: string
     } = {},
   ): Promise<AIResponse> {
-    const provider = options.provider || this.activeProvider
-    const config = this.configs.get(provider)
+    // 链式故障转移：请求 provider → activeProvider → 剩余可用提供商
+    const chain = this.buildFailoverChain(options.provider)
+    let lastError: unknown
 
-    if (!config) {
-      throw new Error(`AI提供商 ${provider} 未配置`)
+    for (const provider of chain) {
+      const config = this.configs.get(provider)
+      if (!config) continue
+
+      try {
+        const result = await this.invokeProvider(provider, config, messages, options)
+        if (provider !== (options.provider || this.activeProvider)) {
+          console.log(`故障转移到提供商: ${provider}`)
+        }
+        return result
+      } catch (error) {
+        lastError = error
+        console.error(`AI服务调用失败 (${provider}):`, error)
+      }
     }
 
-    try {
-      // 根据提供商选择不同的实现
-      let result: any
+    throw new Error(`所有AI提供商不可用: ${lastError instanceof Error ? lastError.message : "未知错误"}`)
+  }
 
-      switch (config.provider) {
-        case "openai":
-          result = await this.callOpenAI(messages, config, options)
-          break
-        case "anthropic":
-          result = await this.callAnthropic(messages, config, options)
-          break
-        case "google":
-          result = await this.callGoogle(messages, config, options)
-          break
-        case "local":
-          result = await this.callLocal(messages, config, options)
-          break
-        default:
-          throw new Error(`不支持的AI提供商: ${config.provider}`)
-      }
+  /** 构建故障转移链：指定/活跃 provider 优先，其余可用者按序兜底 */
+  private static buildFailoverChain(preferred?: string): string[] {
+    const first = preferred && this.configs.has(preferred) ? preferred : this.activeProvider
+    const rest = Array.from(this.configs.keys()).filter((p) => p !== first)
+    return [first, ...rest]
+  }
 
-      return {
-        id: `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        content: result.text,
-        usage: {
-          promptTokens: result.usage?.promptTokens || 0,
-          completionTokens: result.usage?.completionTokens || 0,
-          totalTokens: result.usage?.totalTokens || 0,
-        },
-        model: options.model || config.model,
-        finishReason: result.finishReason || "stop",
-        timestamp: Date.now(),
-      }
-    } catch (error) {
-      console.error(`AI服务调用失败 (${provider}):`, error)
+  /** 单提供商执行（chat 的 switch 抽取） */
+  private static async invokeProvider(
+    _provider: string,
+    config: AIServiceConfig,
+    messages: AIMessage[],
+    options: {
+      temperature?: number
+      maxTokens?: number
+      model?: string
+    },
+  ): Promise<AIResponse> {
+    let result: any
 
-      // 尝试备用提供商
-      if (provider !== this.activeProvider) {
-        console.log("尝试使用备用提供商...")
-        return this.chat(messages, { ...options, provider: this.activeProvider })
-      }
+    switch (config.provider) {
+      case "openai":
+        result = await this.callOpenAI(messages, config, options)
+        break
+      case "anthropic":
+        result = await this.callAnthropic(messages, config, options)
+        break
+      case "google":
+        result = await this.callGoogle(messages, config, options)
+        break
+      case "local":
+        result = await this.callLocal(messages, config, options)
+        break
+      default:
+        throw new Error(`不支持的AI提供商: ${config.provider}`)
+    }
 
-      throw new Error(`AI服务不可用: ${error instanceof Error ? error.message : "未知错误"}`)
+    return {
+      id: `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      content: result.text,
+      usage: {
+        promptTokens: result.usage?.promptTokens || 0,
+        completionTokens: result.usage?.completionTokens || 0,
+        totalTokens: result.usage?.totalTokens || 0,
+      },
+      model: options.model || config.model,
+      finishReason: result.finishReason || "stop",
+      timestamp: Date.now(),
     }
   }
 

@@ -356,7 +356,7 @@ export default function CreateLearningPathPage() {
 
             {/* 交互提示 */}
             <div className="mt-8 text-center text-gray-400 text-sm">
-              <p>左右滑动切换步骤 • 语音说"下一步"或"完成" • 点击圆圈标记完成</p>
+              <p>左右滑动切换步骤 • 语音说&quot;下一步&quot;或&quot;完成&quot; • 点击圆圈标记完成</p>
             </div>
           </div>
         )}

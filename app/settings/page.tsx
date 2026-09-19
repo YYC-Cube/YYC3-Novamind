@@ -792,7 +792,7 @@ export default function SettingsPage() {
         <div className="text-white text-sm space-y-1">
           <p>👆 右滑: 返回上页</p>
           <p>📱 上下滑动: 切换设置分类</p>
-          <p>🗣️ 语音: "交互设置"、"保存设置"</p>
+          <p>🗣️ 语音: &quot;交互设置&quot;、&quot;保存设置&quot;</p>
           <p>⚙️ 实时保存: 更改即时生效</p>
         </div>
       </div>

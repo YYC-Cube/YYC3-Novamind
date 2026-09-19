@@ -487,7 +487,7 @@ export default function MindMapPage() {
         <div className="absolute top-24 right-8 w-80 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
           <h3 className="text-lg font-bold text-white mb-4">{nodes.find((n) => n.id === selectedNode)?.text}</h3>
           <p className="text-gray-300 text-sm mb-4">
-            这是关于"{nodes.find((n) => n.id === selectedNode)?.text}"的详细说明和相关信息。
+            这是关于&quot;{nodes.find((n) => n.id === selectedNode)?.text}&quot;的详细说明和相关信息。
           </p>
           <div className="flex space-x-2">
             <button className="px-4 py-2 bg-purple-500/20 rounded-lg text-purple-300 text-sm hover:bg-purple-500/30 transition-colors">
@@ -505,7 +505,7 @@ export default function MindMapPage() {
         <div className="text-white text-sm space-y-1">
           <p>🖱️ 拖拽: 移动视图</p>
           <p>🤏 双指: 缩放</p>
-          <p>🗣️ 语音: "放大"、"缩小"、"重置"</p>
+          <p>🗣️ 语音: &quot;放大&quot;、&quot;缩小&quot;、&quot;重置&quot;</p>
           <p>👆 点击: 选择节点</p>
         </div>
       </div>

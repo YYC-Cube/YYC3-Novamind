@@ -55,7 +55,30 @@ export const feedback = pgTable("feedback", {
 // Phase B RAG 预留（文档 06 · 资产 6）
 // documents / chunks(vector(1536)) 表在 Phase B 迁移中追加
 
+// ── RAG 知识库（Phase B · 文档 06 资产 6：pgvector 单库路线）──
+// embedding 列为 pgvector vector(1536)；drizzle-orm 暂无原生 vector 类型，
+// 实际建表由 drizzle/*.sql 迁移模板执行（含 CREATE EXTENSION vector）
+export const documents = pgTable("documents", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: text("title").notNull(),
+  sourceUrl: text("source_url"),
+  chunkCount: integer("chunk_count").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const chunks = pgTable("chunks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  documentId: uuid("document_id")
+    .references(() => documents.id, { onDelete: "cascade" })
+    .notNull(),
+  content: text("content").notNull(),
+  chunkIndex: integer("chunk_index").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+})
+
 export type User = typeof users.$inferSelect
 export type Chat = typeof chats.$inferSelect
 export type Message = typeof messages.$inferSelect
 export type Feedback = typeof feedback.$inferSelect
+export type Document = typeof documents.$inferSelect
+export type Chunk = typeof chunks.$inferSelect

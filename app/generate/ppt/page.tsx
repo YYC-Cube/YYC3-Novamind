@@ -412,7 +412,7 @@ export default function PPTGeneratorPage() {
         <div className="text-white text-sm space-y-1">
           <p>👆 左右滑动: 切换幻灯片</p>
           <p>🤏 双指缩放: 预览模式</p>
-          <p>🗣️ 语音: "下一张"、"预览模式"</p>
+          <p>🗣️ 语音: &quot;下一张&quot;、&quot;预览模式&quot;</p>
           <p>📱 上下滑动: 切换视图模式</p>
         </div>
       </div>

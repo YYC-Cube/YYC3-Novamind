@@ -435,7 +435,7 @@ export default function PosterGeneratorPage() {
         <div className="text-white text-sm space-y-1">
           <p>👆 左右滑动: 切换模板</p>
           <p>📱 上下滑动: 切换编辑模式</p>
-          <p>🗣️ 语音: "下一个模板"、"预览模式"</p>
+          <p>🗣️ 语音: &quot;下一个模板&quot;、&quot;预览模式&quot;</p>
           <p>✏️ 点击工具栏: 快速切换功能</p>
         </div>
       </div>

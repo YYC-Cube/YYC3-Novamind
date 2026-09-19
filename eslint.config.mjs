@@ -20,8 +20,12 @@ const eslintConfig = [
   },
   ...coreWebVitals,
   {
-    // 复用 eslint-config-next 内置的 typescript-eslint 插件实例
-    plugins: { '@typescript-eslint': typescript[0].plugins['@typescript-eslint'] },
+    // 复用 eslint-config-next 内置插件实例（react-hooks / @typescript-eslint / react）
+    plugins: {
+      '@typescript-eslint': typescript[0].plugins['@typescript-eslint'],
+      'react-hooks': coreWebVitals.find((c) => c.plugins?.['react-hooks'])?.plugins['react-hooks'],
+      react: coreWebVitals.find((c) => c.plugins?.react)?.plugins.react,
+    },
     rules: {
       // 渐进收紧：no-unused-vars 作为 error 守住"无死代码"基线
       '@typescript-eslint/no-unused-vars': [
@@ -34,7 +38,8 @@ const eslintConfig = [
       'react-hooks/immutability': 'warn',
       'react-hooks/set-state-in-effect': 'warn',
       'react-hooks/purity': 'warn',
-      'react/no-unescaped-entities': 'warn',
+      // 已全量修复（34 处 JSX 裸引号 → 实体），转 error 防止回潮
+      'react/no-unescaped-entities': 'error',
     },
   },
 ]

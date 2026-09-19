@@ -529,7 +529,7 @@ export default function AnalyticsPage() {
         <div className="text-white text-sm space-y-1">
           <p>👆 右滑: 返回上页</p>
           <p>📱 上下滑动: 切换指标类型</p>
-          <p>🗣️ 语音: "使用统计"、"交互分析"</p>
+          <p>🗣️ 语音: &quot;使用统计&quot;、&quot;交互分析&quot;</p>
           <p>📊 实时更新: 数据自动刷新</p>
         </div>
       </div>
