@@ -1,9 +1,11 @@
 "use client"
 
 import { MindMapManager, type MindMapData } from "@/lib/mindmap"
-import { ArrowLeft, Download, Edit3, RotateCcw, ZoomIn, ZoomOut } from "lucide-react"
+import { Download, Edit3, RotateCcw, ZoomIn, ZoomOut } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
+
+import { ResultPageShell } from "@/components/templates/result-page-shell"
 
 export default function MindMapResultPage() {
   const router = useRouter()
@@ -59,82 +61,66 @@ export default function MindMapResultPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-panel flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">正在加载思维导图...</p>
-        </div>
-      </div>
+      <ResultPageShell loading loadingText="正在加载思维导图..." title="">
+        <span />
+      </ResultPageShell>
     )
   }
 
   if (!mindMapData) {
     return (
-      <div className="min-h-screen bg-surface-panel flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-white mb-2">思维导图不存在</h2>
-          <p className="text-gray-400 mb-4">请检查链接是否正确</p>
-          <button
-            onClick={() => router.push("/")}
-            className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-hover"
-          >
-            返回首页
-          </button>
-        </div>
-      </div>
+      <ResultPageShell
+        loading={false}
+        isEmpty
+        emptyTitle="思维导图不存在"
+        emptyDesc="请检查链接是否正确"
+        title=""
+      >
+        <span />
+      </ResultPageShell>
     )
   }
 
   return (
-    <div className="min-h-screen bg-surface-panel text-white">
-      {/* 顶部工具栏 */}
-      <header className="bg-black/30 backdrop-blur-xl border-b border-white/10 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded-lg">
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-lg font-semibold">{mindMapData.title}</h1>
-                <p className="text-sm text-gray-400">创建于 {new Date(mindMapData.createdAt).toLocaleDateString()}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
-                <button onClick={handleZoomOut} className="p-2 hover:bg-white/20 rounded-md" title="缩小">
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <span className="px-2 text-sm font-medium">{Math.round(zoom * 100)}%</span>
-                <button onClick={handleZoomIn} className="p-2 hover:bg-white/20 rounded-md" title="放大">
-                  <ZoomIn className="w-4 h-4" />
-                </button>
-                <button onClick={handleResetView} className="p-2 hover:bg-white/20 rounded-md" title="重置视图">
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-              </div>
-
-              <button
-                onClick={handleEdit}
-                className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                <Edit3 className="w-4 h-4" />
-                编辑
-              </button>
-
-              <button
-                onClick={handleExport}
-                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <Download className="w-4 h-4" />
-                导出
-              </button>
-            </div>
+    <ResultPageShell
+      loading={false}
+      emptyTitle=""
+      emptyDesc=""
+      title={mindMapData.title}
+      meta={<>创建于 {new Date(mindMapData.createdAt).toLocaleDateString()}</>}
+      actions={
+        <>
+          <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
+            <button onClick={handleZoomOut} className="p-2 hover:bg-white/20 rounded-md" title="缩小">
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <span className="px-2 text-sm font-medium">{Math.round(zoom * 100)}%</span>
+            <button onClick={handleZoomIn} className="p-2 hover:bg-white/20 rounded-md" title="放大">
+              <ZoomIn className="w-4 h-4" />
+            </button>
+            <button onClick={handleResetView} className="p-2 hover:bg-white/20 rounded-md" title="重置视图">
+              <RotateCcw className="w-4 h-4" />
+            </button>
           </div>
-        </div>
-      </header>
 
+          <button
+            onClick={handleEdit}
+            className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <Edit3 className="w-4 h-4" />
+            编辑
+          </button>
+
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Download className="w-4 h-4" />
+            导出
+          </button>
+        </>
+      }
+    >
       {/* 思维导图显示区域 */}
       <div className="relative w-full h-screen overflow-hidden">
         <div
@@ -211,6 +197,6 @@ export default function MindMapResultPage() {
           <div>最后更新: {new Date(mindMapData.updatedAt).toLocaleString()}</div>
         </div>
       </div>
-    </div>
+    </ResultPageShell>
   )
 }

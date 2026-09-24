@@ -7,10 +7,11 @@
  * - admin：全量视角（可切本人）；普通用户：仅本人
  * - 数据源 GET /api/usage（无 DB 显示降级提示）
  */
-import { useCallback, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, BarChart3 } from "lucide-react"
+import { SummaryCard } from "@/components/summary-card"
 import { Button } from "@/components/ui/button"
+import { ArrowLeft, BarChart3 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 
 interface UsageRow {
   groupKey: string
@@ -85,6 +86,13 @@ export default function UsageDashboardPage() {
   const totalTokens = rows.reduce((s, r) => s + r.totalTokens, 0)
   const totalCost = rows.reduce((s, r) => s + r.costUsd, 0)
   const totalCalls = rows.reduce((s, r) => s + r.calls, 0)
+  // sparkline 趋势（归一化 0~1，取最近 12 组，聚合维度变化时随 rows 更新）
+  const maxCalls = Math.max(1, ...rows.map((r) => r.calls))
+  const maxTokens = Math.max(1, ...rows.map((r) => r.totalTokens))
+  const maxCost = Math.max(0.0001, ...rows.map((r) => r.costUsd))
+  const callTrend = rows.slice(-12).map((r) => r.calls / maxCalls)
+  const tokenTrend = rows.slice(-12).map((r) => r.totalTokens / maxTokens)
+  const costTrend = rows.slice(-12).map((r) => r.costUsd / maxCost)
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -144,20 +152,17 @@ export default function UsageDashboardPage() {
           </div>
         ) : (
           <>
-            {/* 汇总卡片 */}
+            {/* 汇总卡片（SummaryCard：动效即语义，值变化时数字滚动 + 趋势 sparkline） */}
             <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
-                <p className="text-xs text-gray-500">调用次数</p>
-                <p className="mt-1 text-2xl font-semibold">{totalCalls.toLocaleString()}</p>
-              </div>
-              <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
-                <p className="text-xs text-gray-500">总 Tokens</p>
-                <p className="mt-1 text-2xl font-semibold">{formatTokens(totalTokens)}</p>
-              </div>
-              <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
-                <p className="text-xs text-gray-500">折算成本（USD）</p>
-                <p className="mt-1 text-2xl font-semibold">${totalCost.toFixed(4)}</p>
-              </div>
+              <SummaryCard label="调用次数" value={totalCalls} sparkline={callTrend} accent="#60a5fa" />
+              <SummaryCard label="总 Tokens" value={totalTokens} format={formatTokens} sparkline={tokenTrend} />
+              <SummaryCard
+                label="折算成本（USD）"
+                value={Number(totalCost.toFixed(4))}
+                format={(v) => `$${v.toFixed(4)}`}
+                sparkline={costTrend}
+                accent="#34d399"
+              />
             </div>
 
             {/* 明细表 */}

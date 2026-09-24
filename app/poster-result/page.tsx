@@ -1,9 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Check, Copy, Download, Eye, ImageIcon, Palette, RefreshCw, Settings, Share2 } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Download, Share2, RefreshCw, Palette, Settings, Eye, Copy, Check, ImageIcon } from "lucide-react"
-import { PosterGenerator, type PosterConfig, type GeneratedPoster } from "@/lib/poster-generator"
+import { useEffect, useState } from "react"
+
+import { ResultPageShell } from "@/components/templates/result-page-shell"
+import { PosterGenerator, type GeneratedPoster, type PosterConfig } from "@/lib/poster-generator"
 
 export default function PosterResultPage() {
   const router = useRouter()
@@ -135,13 +137,9 @@ export default function PosterResultPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-surface-panel flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400 text-lg">正在生成海报...</p>
-          <p className="text-gray-400 text-sm mt-2">AI正在为您创作独特的视觉设计</p>
-        </div>
-      </div>
+      <ResultPageShell loading loadingText="正在生成海报..." accent="#3b82f6" title="">
+        <span />
+      </ResultPageShell>
     )
   }
 
@@ -189,49 +187,42 @@ export default function PosterResultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-panel">
-      {/* 顶部导航 */}
-      <header className="bg-black/30 backdrop-blur-xl border-b border-white/10 border-white/10 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="text-lg font-semibold text-white">海报生成结果</h1>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              title="主题设置"
-            >
-              <Palette className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleCopy}
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-              title="复制SVG代码"
-            >
-              {copySuccess ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
-            </button>
-            <button
-              onClick={handleShare}
-              className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-              title="分享海报"
-            >
-              {shareSuccess ? <Check className="w-5 h-5 text-green-600" /> : <Share2 className="w-5 h-5" />}
-            </button>
-            <button
-              onClick={handleRegenerate}
-              className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-              title="重新生成"
-            >
-              <RefreshCw className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </header>
+    <ResultPageShell
+      loading={false}
+      title="海报生成结果"
+      actions={
+        <>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="主题设置"
+          >
+            <Palette className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleCopy}
+            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+            title="复制SVG代码"
+          >
+            {copySuccess ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={handleShare}
+            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+            title="分享海报"
+          >
+            {shareSuccess ? <Check className="w-5 h-5 text-green-600" /> : <Share2 className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={handleRegenerate}
+            className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+            title="重新生成"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </>
+      }
+    >
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -305,11 +296,10 @@ export default function PosterResultPage() {
                   <button
                     key={themeOption.key}
                     onClick={() => handleThemeChange(themeOption.key)}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                      selectedTheme === themeOption.key
-                        ? "border-blue-300 bg-blue-50 text-blue-700"
-                        : "border-white/10 hover:border-white/20 hover:bg-white/10"
-                    }`}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${selectedTheme === themeOption.key
+                      ? "border-blue-300 bg-blue-50 text-blue-700"
+                      : "border-white/10 hover:border-white/20 hover:bg-white/10"
+                      }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className={`w-4 h-4 rounded ${themeOption.color}`}></div>
@@ -412,6 +402,6 @@ export default function PosterResultPage() {
           </button>
         </div>
       )}
-    </div>
+    </ResultPageShell>
   )
 }

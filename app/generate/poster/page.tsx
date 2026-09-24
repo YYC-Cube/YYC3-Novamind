@@ -1,9 +1,11 @@
 "use client"
 
 import { gestureUtils, voiceUtils } from "@/lib/utils"
-import { ArrowLeft, Download, Eye, Hand, ImageIcon, Layout, Mic, Palette, Share2, Type } from "lucide-react"
+import { Download, Eye, Hand, ImageIcon, Layout, Mic, Palette, Share2, Type } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
+
+import { GeneratorPageShell, ToolbarButton } from "@/components/templates/generator-page-shell"
 
 interface PosterTemplate {
   id: string
@@ -214,72 +216,48 @@ export default function PosterGeneratorPage() {
 
   if (isGenerating) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative mb-8">
-            <div className="w-24 h-24 border-4 border-pink-400/30 rounded-full animate-spin border-t-pink-400"></div>
-            <ImageIcon className="w-10 h-10 text-pink-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-4">AI正在设计海报</h2>
-          <p className="text-gray-400 mb-2">分析设计需求...</p>
-          <p className="text-gray-400">生成创意方案...</p>
-        </div>
-      </div>
+      <GeneratorPageShell
+        icon={ImageIcon}
+        accent="pink"
+        loadingTitle="AI正在设计海报"
+        loadingSteps={["分析设计需求...", "生成创意方案..."]}
+        isGenerating
+        title=""
+      >
+        <span />
+      </GeneratorPageShell>
     )
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative"
+    <GeneratorPageShell
+      icon={ImageIcon}
+      accent="pink"
+      loadingTitle=""
+      loadingSteps={[]}
+      isGenerating={false}
+      title="海报设计器"
+      containerRef={containerRef}
+      actions={
+        <>
+          <ToolbarButton title="模板" active={editMode === "template"} onClick={() => setEditMode("template")}>
+            <Layout className="w-5 h-5" />
+          </ToolbarButton>
+          <ToolbarButton title="文字" active={editMode === "content"} onClick={() => setEditMode("content")}>
+            <Type className="w-5 h-5" />
+          </ToolbarButton>
+          <ToolbarButton title="预览" active={editMode === "preview"} onClick={() => setEditMode("preview")}>
+            <Eye className="w-5 h-5" />
+          </ToolbarButton>
+          <ToolbarButton title="下载">
+            <Download className="w-5 h-5" />
+          </ToolbarButton>
+          <ToolbarButton title="分享">
+            <Share2 className="w-5 h-5" />
+          </ToolbarButton>
+        </>
+      }
     >
-      {/* 顶部工具栏 */}
-      <div className="absolute top-0 left-0 right-0 z-20 bg-black/20 backdrop-blur-sm border-b border-white/10">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => router.back()}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </button>
-            <h1 className="text-xl font-bold text-white">海报设计器</h1>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setEditMode("template")}
-              className={`p-2 rounded-full transition-colors ${editMode === "template"
-                ? "bg-purple-500/20 text-purple-400"
-                : "bg-white/10 text-white hover:bg-white/20"
-                }`}
-            >
-              <Layout className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setEditMode("content")}
-              className={`p-2 rounded-full transition-colors ${editMode === "content" ? "bg-blue-500/20 text-blue-400" : "bg-white/10 text-white hover:bg-white/20"
-                }`}
-            >
-              <Type className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setEditMode("preview")}
-              className={`p-2 rounded-full transition-colors ${editMode === "preview" ? "bg-green-500/20 text-green-400" : "bg-white/10 text-white hover:bg-white/20"
-                }`}
-            >
-              <Eye className="w-5 h-5" />
-            </button>
-            <button className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
-              <Download className="w-5 h-5 text-white" />
-            </button>
-            <button className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
-              <Share2 className="w-5 h-5 text-white" />
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* 主内容区域 */}
       <div className="pt-20 pb-8 px-6 h-screen flex">
         {/* 侧边栏 */}
@@ -439,6 +417,6 @@ export default function PosterGeneratorPage() {
           <p>✏️ 点击工具栏: 快速切换功能</p>
         </div>
       </div>
-    </div>
+    </GeneratorPageShell>
   )
 }

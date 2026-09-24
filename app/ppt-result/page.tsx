@@ -2,7 +2,6 @@
 
 import { PPTGenerator, type PPTDocument } from "@/lib/ppt-generator"
 import {
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Code,
@@ -20,6 +19,8 @@ import {
 } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useRef, useState } from "react"
+
+import { ResultPageShell } from "@/components/templates/result-page-shell"
 
 export default function PPTResultPage() {
   const searchParams = useSearchParams()
@@ -217,17 +218,9 @@ export default function PPTResultPage() {
   // 渲染加载状态
   if (isLoading) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}
-      >
-        <div className="text-center">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-lg font-medium text-gray-600 dark:text-gray-300">正在智能生成PPT...</p>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            AI正在分析您的需求并创作内容，这可能需要几秒钟时间
-          </p>
-        </div>
-      </div>
+      <ResultPageShell loading loadingText="正在智能生成PPT..." accent="#3b82f6" title="">
+        <span />
+      </ResultPageShell>
     )
   }
 
@@ -280,110 +273,97 @@ export default function PPTResultPage() {
   }
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-800"}`}>
-      {/* 顶部导航栏 */}
-      <header className={`bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30 ${isFullscreen ? "hidden" : ""}`}>
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => router.back()}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div className="flex items-center">
-              <Presentation className="text-blue-600 text-xl mr-2" />
-              <h1 className="text-xl font-semibold">AI PPT Generator</h1>
-            </div>
+    <ResultPageShell
+      loading={false}
+      title="AI PPT Generator"
+      meta={ppt.title}
+      actions={
+        <>
+          <button
+            onClick={() => setPreviewMode(previewMode === "single" ? "grid" : "single")}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title={previewMode === "single" ? "网格视图" : "单页视图"}
+          >
+            {previewMode === "single" ? <Grid3X3 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+          </button>
+
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title="切换主题"
+          >
+            {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+
+          <button
+            onClick={generateSuggestion}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title="AI优化建议"
+          >
+            <Lightbulb className="w-5 h-5 text-yellow-500" />
+          </button>
+
+          <button
+            onClick={toggleCodeView}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title={showCode ? "隐藏代码" : "查看代码"}
+          >
+            <Code className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title={isFullscreen ? "退出全屏" : "全屏查看"}
+          >
+            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+          </button>
+
+          <button
+            onClick={downloadPPT}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            下载
+          </button>
+        </>
+      }
+    >
+      {/* 顶部导航栏结束（由 ResultPageShell 承担第一栏），以下保留 PPT 信息第二导航栏 */}
+      <div className="bg-gray-50 dark:bg-gray-700 py-2 px-4 border-t border-gray-200 dark:border-gray-600">
+        <div className="container mx-auto flex flex-wrap items-center justify-between">
+          <div className="flex items-center mr-4">
+            <h2 className="text-lg font-semibold truncate max-w-md">{ppt.title}</h2>
+            <span className="ml-2 text-sm text-gray-500 dark:text-gray-300">
+              {new Date(ppt.createdAt).toLocaleDateString()}
+            </span>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setPreviewMode(previewMode === "single" ? "grid" : "single")}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title={previewMode === "single" ? "网格视图" : "单页视图"}
-            >
-              {previewMode === "single" ? <Grid3X3 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
-            </button>
-
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title="切换主题"
-            >
-              {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-            </button>
-
-            <button
-              onClick={generateSuggestion}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title="AI优化建议"
-            >
-              <Lightbulb className="w-5 h-5 text-yellow-500" />
-            </button>
-
-            <button
-              onClick={toggleCodeView}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title={showCode ? "隐藏代码" : "查看代码"}
-            >
-              <Code className="w-5 h-5" />
-            </button>
-
-            <button
-              onClick={toggleFullscreen}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title={isFullscreen ? "退出全屏" : "全屏查看"}
-            >
-              {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-            </button>
-
-            <button
-              onClick={downloadPPT}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              下载
-            </button>
-          </div>
-        </div>
-
-        {/* 第二导航栏 - PPT信息 */}
-        <div className="bg-gray-50 dark:bg-gray-700 py-2 px-4 border-t border-gray-200 dark:border-gray-600">
-          <div className="container mx-auto flex flex-wrap items-center justify-between">
-            <div className="flex items-center mr-4">
-              <h2 className="text-lg font-semibold truncate max-w-md">{ppt.title}</h2>
-              <span className="ml-2 text-sm text-gray-500 dark:text-gray-300">
-                {new Date(ppt.createdAt).toLocaleDateString()}
+          <div className="flex items-center space-x-3 mt-2 sm:mt-0">
+            <div className="flex items-center text-sm">
+              <span className="text-gray-500 dark:text-gray-300 mr-2">主题:</span>
+              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded-full text-xs">
+                {ppt.templateId}
               </span>
             </div>
 
-            <div className="flex items-center space-x-3 mt-2 sm:mt-0">
-              <div className="flex items-center text-sm">
-                <span className="text-gray-500 dark:text-gray-300 mr-2">主题:</span>
-                <span className="px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded-full text-xs">
-                  {ppt.templateId}
-                </span>
-              </div>
+            <div className="flex items-center text-sm">
+              <span className="text-gray-500 dark:text-gray-300 mr-2">幻灯片:</span>
+              <span>{ppt.slides.length}</span>
+            </div>
 
-              <div className="flex items-center text-sm">
-                <span className="text-gray-500 dark:text-gray-300 mr-2">幻灯片:</span>
-                <span>{ppt.slides.length}</span>
-              </div>
-
-              <div className="flex items-center">
-                <button
-                  onClick={copyShareLink}
-                  className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex items-center"
-                >
-                  <Copy className="w-3 h-3 mr-1" />
-                  <span>{isCopied ? "已复制" : "分享"}</span>
-                </button>
-              </div>
+            <div className="flex items-center">
+              <button
+                onClick={copyShareLink}
+                className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex items-center"
+              >
+                <Copy className="w-3 h-3 mr-1" />
+                <span>{isCopied ? "已复制" : "分享"}</span>
+              </button>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* 主要内容区 */}
       <main className="container mx-auto px-4 py-6">
@@ -512,6 +492,6 @@ export default function PPTResultPage() {
           </div>
         )}
       </main>
-    </div>
+    </ResultPageShell>
   )
 }
