@@ -348,9 +348,10 @@ YYC³ NovaMind 遵循 **五维驱动** 架构理念：
 | :----- | :----- |
 | [CHANGELOG.md](./CHANGELOG.md) | 版本变更记录（v2.0.0 全量交付清单） |
 | [CONTRIBUTING.md](./CONTRIBUTING.md) | 贡献流程与行为准则 |
-| [docs/YYC3-Docs/](./docs/YYC3-Docs/) | MkDocs 文档站（架构 / CICD / 发布 / 风格指南） |
-| [docs/yyc3-novamind-m3-20260918/](./docs/yyc3-novamind-m3-20260918/) | 会话四件套 + 审核报告 + 同类项目对标资产文档（八资产闭环） |
+| [docs/yyc3-novamind-m3-20260918/](./docs/yyc3-novamind-m3-20260918/) | 会话四件套 + 审核报告 + 同类项目对标资产文档（八资产闭环）+ 设计美化推进方案（09） |
 | [docs/…/07-生产供给配置手册.md](./docs/yyc3-novamind-m3-20260918/07-生产供给配置手册.md) | 密钥生成 / 数据库配置 / 生产供给命令（占位符版） |
+| [docs/…/09-设计美化实施推进方案.md](./docs/yyc3-novamind-m3-20260918/09-设计美化实施推进方案.md) | 设计体系推进台账（13 任务全 ✅：Token/模板化/动效/AI 换肤） |
+| [docs/全局审核系统-使用指南.md](./docs/全局审核系统-使用指南.md) | 全局多维度审核系统使用说明 |
 | [.env.example](./.env.example) | 环境变量模板（Sentry / AI / MCP / RAG） |
 | `/api-docs`（dev 模式） | Swagger UI 在线契约 |
 

@@ -7,6 +7,20 @@ YYC³ NovaMind 所有重要更改均记录在此文件中。
 
 ## [Unreleased]
 
+### 新增（设计美化专项 · 09 方案 13 任务全 ✅）
+
+- **设计令牌单源**：`app/tokens.css`（品牌/表面/圆角/动效/间距五组令牌 + 10 语义工具类）+ Tailwind `brand`/`surface` 色组与 `rounded-card/panel` 语义桥接
+- **页面壳模板化**：`components/templates/` 双壳（GeneratorPageShell 四色 accent + containerRef 透传 / ResultPageShell loading/empty 双早退），6 页接入；`components/summary-card.tsx` 摘要卡（rAF 数字滚动 + sparkline + vs 基线，动效即语义）
+- **动效体系**：`app/template.tsx` 全局翻页动画（零 JS，200ms Apple 节奏，`prefers-reduced-motion` 自动禁用）；`lib/view-transitions.ts` View Transitions 封装 + conversations/learning 列表→详情共享元素过渡（vt-active 防闪黑协调）
+- **AI 一句话换肤**：`lib/theme-schema.ts`（zod 主题包契约 + :root 令牌覆盖 + localStorage 持久化）+ `/api/ai` `generate_theme` action（结构化输出 + usage 旁挂计量）+ settings 生成/预览/采纳/重置入口（无 Key 自动隐藏，D10 同款降级）
+- **文档治理**：`09-设计美化实施推进方案.md` 台账 v1.6.0（13/13 ✅）+ 03 总结 v8.0.0（衔接指南）；`docs/openapi.md` 过时契约说明归档至 `docs/_archive/2026-09-24/`；根目录 `GLOBAL_AUDIT_GUIDE.md` 移编 `docs/全局审核系统-使用指南.md`；README 文档导航断链修复（移除已删 YYC3-Docs 引用）
+
+### 变更（设计美化专项）
+
+- **hydration 全站清零**：粒子 `Math.random()`（mulberry32 确定性随机）、`lastCheck` SSR 时间、`auditDate` 反序列化 3 处真隐患修复
+- **暗色审计**：核心六页（mindmap-result/favorites/learning/conversations/poster-result/learning-path[id]）浅色硬编码 157 处清零；home/history/settings 令牌化示范改造
+- **品牌统一**：全站「NovaMind 星图智语」（manifest/PWA title/OG 一致）
+
 ### 安全
 
 - **依赖漏洞治理**：`pnpm audit` 23 项（2 critical / 10 high / 8 moderate / 3 low）→ **4 项**（2 low / 2 moderate，均为 devDeps 且需主版本升级），**生产依赖 0 漏洞**
