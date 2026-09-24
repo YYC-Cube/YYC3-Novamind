@@ -1,3 +1,6 @@
+/* 设计令牌单一来源（P1-1）：品牌/表面/动效/间距语义令牌（@import 必须在所有规则之前） */
+@import './tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -65,7 +68,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 }
 
@@ -159,25 +164,25 @@
 
 /* 加载动画 */
 .loading-dots::after {
-  content: "";
+  content: '';
   animation: loading-dots 1.5s infinite;
 }
 
 @keyframes loading-dots {
   0% {
-    content: "";
+    content: '';
   }
   25% {
-    content: ".";
+    content: '.';
   }
   50% {
-    content: "..";
+    content: '..';
   }
   75% {
-    content: "...";
+    content: '...';
   }
   100% {
-    content: "";
+    content: '';
   }
 }
 
@@ -203,7 +208,7 @@
 }
 
 .chat-bubble::before {
-  content: "";
+  content: '';
   position: absolute;
   width: 0;
   height: 0;
@@ -231,7 +236,7 @@
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
-  font-family: "Fira Code", "Monaco", "Cascadia Code", "Roboto Mono", monospace;
+  font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
   font-size: 14px;
   line-height: 1.5;
 }

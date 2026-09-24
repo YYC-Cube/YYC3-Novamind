@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Search, Filter, Calendar, Clock, Star, Hand, Mic } from "lucide-react"
 import { gestureUtils, voiceUtils } from "@/lib/utils"
+import { ArrowLeft, Calendar, Clock, Filter, Hand, Mic, Search, Star } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
 
 interface HistoryItem {
   id: string
@@ -317,7 +317,7 @@ export default function HistoryPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="搜索历史记录..."
-              className="w-full px-4 py-2 pl-10 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="w-full px-4 py-2 pl-10 bg-surface-card border border-glass rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
 
@@ -340,11 +340,10 @@ export default function HistoryPage() {
 
           <button
             onClick={startVoiceSearch}
-            className={`p-2 rounded-lg transition-colors ${
-              isListening
-                ? "bg-red-500/20 border border-red-400/30 text-red-400"
-                : "bg-white/10 hover:bg-white/20 border border-white/20 text-white"
-            }`}
+            className={`p-2 rounded-lg transition-colors ${isListening
+              ? "bg-red-500/20 border border-red-400/30 text-red-400"
+              : "bg-white/10 hover:bg-white/20 border border-white/20 text-white"
+              }`}
           >
             <Mic className="w-4 h-4" />
           </button>
@@ -360,7 +359,7 @@ export default function HistoryPage() {
           <select
             value={filterState.type}
             onChange={(e) => setFilterState((prev) => ({ ...prev, type: e.target.value as any }))}
-            className="px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="px-3 py-1 bg-surface-card border border-glass rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
           >
             <option value="all">全部类型</option>
             <option value="search">搜索</option>
@@ -372,7 +371,7 @@ export default function HistoryPage() {
           <select
             value={filterState.timeRange}
             onChange={(e) => setFilterState((prev) => ({ ...prev, timeRange: e.target.value as any }))}
-            className="px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="px-3 py-1 bg-surface-card border border-glass rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
           >
             <option value="all">全部时间</option>
             <option value="today">今天</option>
@@ -382,11 +381,10 @@ export default function HistoryPage() {
 
           <button
             onClick={() => setFilterState((prev) => ({ ...prev, onlyFavorites: !prev.onlyFavorites }))}
-            className={`px-3 py-1 rounded text-sm transition-colors ${
-              filterState.onlyFavorites
-                ? "bg-yellow-500/20 border border-yellow-400/30 text-yellow-400"
-                : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
-            }`}
+            className={`px-3 py-1 rounded text-sm transition-colors ${filterState.onlyFavorites
+              ? "bg-yellow-500/20 border border-yellow-400/30 text-yellow-400"
+              : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+              }`}
           >
             <Star className="w-4 h-4 inline mr-1" />
             收藏
@@ -407,9 +405,8 @@ export default function HistoryPage() {
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className={`bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 transition-all duration-300 hover:bg-white/15 hover:scale-102 ${
-                  selectedItems.has(item.id) ? "ring-2 ring-purple-400" : ""
-                }`}
+                className={`bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6 transition-all [transition-duration:var(--motion-interactive)] hover:bg-surface-card-strong hover:scale-102 ${selectedItems.has(item.id) ? "ring-2 ring-purple-400" : ""
+                  }`}
                 onClick={() => {
                   if (gestureMode === "select") {
                     const newSelected = new Set(selectedItems)
@@ -432,11 +429,10 @@ export default function HistoryPage() {
                           e.stopPropagation()
                           toggleFavorite(item.id)
                         }}
-                        className={`p-1 rounded-full transition-colors ${
-                          item.isFavorite
-                            ? "text-yellow-400 hover:text-yellow-300"
-                            : "text-gray-400 hover:text-yellow-400"
-                        }`}
+                        className={`p-1 rounded-full transition-colors ${item.isFavorite
+                          ? "text-yellow-400 hover:text-yellow-300"
+                          : "text-gray-400 hover:text-yellow-400"
+                          }`}
                       >
                         <Star className={`w-4 h-4 ${item.isFavorite ? "fill-current" : ""}`} />
                       </button>

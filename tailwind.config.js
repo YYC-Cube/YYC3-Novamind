@@ -52,11 +52,25 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        /* P1-2 桥接：NovaMind 品牌语义色（令牌源 app/tokens.css） */
+        brand: {
+          DEFAULT: "var(--brand-primary)",
+          hover: "var(--brand-primary-hover)",
+          secondary: "var(--brand-secondary)",
+          accent: "var(--brand-accent)",
+        },
+        surface: {
+          card: "var(--surface-card)",
+          "card-strong": "var(--surface-card-strong)",
+          panel: "var(--surface-panel)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        card: "var(--radius-card)",
+        panel: "var(--radius-panel)",
       },
       keyframes: {
         "accordion-down": {

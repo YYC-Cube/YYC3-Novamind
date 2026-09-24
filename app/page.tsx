@@ -278,7 +278,7 @@ export default function HomePage() {
       ref={containerRef}
       className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden"
       style={{
-        background: `radial-gradient(circle at ${isGazing ? "50% 50%" : "30% 70%"}, rgba(139, 92, 246, 0.3) 0%, transparent 50%)`,
+        background: `radial-gradient(circle at ${isGazing ? "50% 50%" : "30% 70%"}, rgb(139 92 246 / 0.3) 0%, transparent 50%)`,
       }}
     >
       {/* 动态背景粒子（确定性伪随机：SSR 与客户端输出一致，避免水合不匹配） */}
@@ -316,7 +316,7 @@ export default function HomePage() {
             alt="NovaMind 星图智语 Logo"
             width={40}
             height={40}
-            className="rounded-xl shadow-lg shadow-purple-500/30"
+            className="rounded-xl shadow-brand"
             priority
           />
           <div className="leading-tight">
@@ -329,7 +329,7 @@ export default function HomePage() {
           onClick={() => setMenuOpen((v) => !v)}
           aria-expanded={menuOpen}
           aria-label="功能菜单"
-          className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 text-white text-sm transition-all duration-300 hover:bg-white/20 hover:scale-105"
+          className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-surface-card backdrop-blur-xl rounded-2xl border border-glass text-white text-sm transition-all [transition-duration:var(--motion-interactive)] hover:bg-surface-card-strong hover:scale-105"
         >
           <LayoutTemplate className="w-4 h-4" />
           功能菜单
@@ -337,7 +337,7 @@ export default function HomePage() {
 
         {/* 功能菜单面板（12 项核心能力统一入口） */}
         {menuOpen && (
-          <div className="absolute top-20 right-6 z-20 w-[min(92vw,560px)] max-h-[70vh] overflow-y-auto bg-slate-900/90 backdrop-blur-2xl rounded-3xl border border-white/15 shadow-2xl shadow-purple-500/20 p-5">
+          <div className="absolute top-20 right-6 z-20 w-[min(92vw,560px)] max-h-[70vh] overflow-y-auto bg-surface-panel backdrop-blur-2xl rounded-panel border border-glass-soft shadow-2xl shadow-purple-500/20 p-5">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {featureMenu.map((item) => (
                 <button
@@ -347,7 +347,7 @@ export default function HomePage() {
                     setMenuOpen(false)
                     router.push(item.href)
                   }}
-                  className="group flex flex-col items-start gap-1.5 p-4 bg-white/5 hover:bg-white/15 rounded-2xl border border-white/10 text-left transition-all duration-200 hover:scale-[1.03]"
+                  className="group flex flex-col items-start gap-1.5 p-4 bg-surface-card hover:bg-surface-card-strong rounded-2xl border border-glass-soft text-left transition-all [transition-duration:var(--motion-interactive)] hover:scale-[1.03]"
                 >
                   <item.icon className="w-5 h-5 text-purple-300 group-hover:text-purple-200" />
                   <div className="text-white text-sm font-medium">{item.label}</div>
@@ -358,9 +358,9 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* 标题区域 - 响应式动画 */}
+        {/* 标题区域 - 响应式动画（P1-3 令牌化示范） */}
         <div
-          className={`text-center mb-12 transition-all duration-1000 ${query ? "transform -translate-y-8 scale-90" : ""
+          className={`text-center mb-[var(--space-section)] transition-all [transition-duration:var(--motion-slow)] ${query ? "transform -translate-y-8 scale-90" : ""
             }`}
         >
           <div className="flex items-center justify-center gap-4 mb-6">
@@ -369,10 +369,10 @@ export default function HomePage() {
               alt="NovaMind Logo"
               width={64}
               height={64}
-              className="rounded-2xl shadow-xl shadow-purple-500/40"
+              className="rounded-2xl shadow-brand"
               priority
             />
-            <h1 className="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+            <h1 className="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-[var(--brand-gradient)]">
               NovaMind
             </h1>
           </div>
@@ -396,7 +396,7 @@ export default function HomePage() {
         {/* 智能输入区域 */}
         <div className="w-full max-w-4xl relative">
           <div
-            className={`relative bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 transition-all duration-500 ${query ? "shadow-2xl shadow-purple-500/25" : "shadow-lg"
+            className={`relative bg-surface-card backdrop-blur-xl rounded-card border border-glass transition-all duration-500 ${query ? "shadow-2xl shadow-purple-500/25" : "shadow-lg"
               }`}
           >
             <textarea

@@ -1,0 +1,99 @@
+/*
+ * NovaMind 设计令牌单一来源（P1-1 交付物）
+ * 依据：docs/yyc3-novamind-m3-20260918/09-设计美化实施推进方案.md Task P1-1
+ * 规则：品牌语义令牌唯一在此定义；shadcn 基础变量仍在 globals.css @layer base
+ */
+
+:root {
+  /* ===== 品牌色彩 ===== */
+  --brand-primary: #8b5cf6; /* NovaMind 紫 */
+  --brand-primary-hover: #7c3aed;
+  --brand-secondary: #3b82f6; /* 协同蓝 */
+  --brand-accent: #ec4899; /* 点缀粉 */
+  --brand-gradient: linear-gradient(90deg, #60a5fa, #c084fc, #f472b6); /* 标题渐变（蓝→紫→粉） */
+  --brand-gradient-radial: radial-gradient(circle, rgb(139 92 246 / 0.3) 0%, transparent 50%);
+
+  /* ===== 表面与描边 ===== */
+  --surface-card: rgb(255 255 255 / 0.1); /* 玻璃拟态卡片底 */
+  --surface-card-strong: rgb(255 255 255 / 0.15);
+  --surface-panel: rgb(15 23 42 / 0.9); /* 深色面板底（菜单/弹层） */
+  --surface-backdrop: rgb(255 255 255 / 0.1); /* backdrop-blur 配套底色 */
+  --border-glass: rgb(255 255 255 / 0.2);
+  --border-glass-soft: rgb(255 255 255 / 0.1);
+  --shadow-brand: 0 8px 30px rgb(139 92 246 / 0.25);
+
+  /* ===== 圆角层级 ===== */
+  --radius-card: 1.5rem; /* rounded-3xl 等价，卡片/输入容器 */
+  --radius-panel: 1.75rem; /* 面板/菜单 */
+  --radius-pill: 9999px; /* 胶囊/状态徽章 */
+
+  /* ===== 动效 ===== */
+  --motion-page: 200ms cubic-bezier(0.4, 0, 0.2, 1); /* Apple 节奏翻页 */
+  --motion-interactive: 300ms cubic-bezier(0.4, 0, 0.2, 1); /* 按钮/卡片 hover */
+  --motion-slow: 1000ms ease-in-out; /* 标题区大过渡 */
+
+  /* ===== 间距（4px 基准网格，语义化常用档位） ===== */
+  --space-section: 3rem; /* 区块间距（mb-12 等价） */
+  --space-gutter: 1rem; /* 页面左右留白 */
+}
+
+.dark {
+  --surface-card: rgb(255 255 255 / 0.08);
+  --surface-card-strong: rgb(255 255 255 / 0.15);
+  --border-glass: rgb(255 255 255 / 0.15);
+  --shadow-brand: 0 8px 30px rgb(139 92 246 / 0.35);
+}
+
+/* ===== 语义工具类（过渡期桥梁：页面可直接消费；独立文件不含 @layer，由导入顺序保证优先级） ===== */
+.bg-surface-card {
+  background-color: var(--surface-card);
+}
+.bg-surface-card-strong {
+  background-color: var(--surface-card-strong);
+}
+.bg-surface-panel {
+  background-color: var(--surface-panel);
+}
+.border-glass {
+  border-color: var(--border-glass);
+}
+.border-glass-soft {
+  border-color: var(--border-glass-soft);
+}
+.text-brand {
+  color: var(--brand-primary);
+}
+.bg-brand {
+  background-color: var(--brand-primary);
+}
+.shadow-brand {
+  box-shadow: var(--shadow-brand);
+}
+.rounded-card {
+  border-radius: var(--radius-card);
+}
+.rounded-panel {
+  border-radius: var(--radius-panel);
+}
+
+/* ===== 页面切换动画（P3-1 前置：keyframes 先行注册） ===== */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
+
+.page-enter {
+  animation: pageIn var(--motion-page);
+}

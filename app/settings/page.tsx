@@ -331,7 +331,7 @@ export default function SettingsPage() {
         {/* 交互设置 */}
         {activeSection === "interaction" && (
           <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Mic className="w-5 h-5 mr-2 text-blue-400" />
                 语音交互
@@ -371,7 +371,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Hand className="w-5 h-5 mr-2 text-green-400" />
                 手势控制
@@ -411,7 +411,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Eye className="w-5 h-5 mr-2 text-orange-400" />
                 其他交互
@@ -457,7 +457,7 @@ export default function SettingsPage() {
         {/* 界面设置 */}
         {activeSection === "interface" && (
           <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Palette className="w-5 h-5 mr-2 text-purple-400" />
                 主题外观
@@ -538,7 +538,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Globe className="w-5 h-5 mr-2 text-blue-400" />
                 语言设置
@@ -572,7 +572,7 @@ export default function SettingsPage() {
         {/* 隐私设置 */}
         {activeSection === "privacy" && (
           <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2 text-green-400" />
                 数据隐私
@@ -657,7 +657,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Trash2 className="w-5 h-5 mr-2 text-red-400" />
                 数据管理
@@ -681,7 +681,7 @@ export default function SettingsPage() {
         {/* 高级设置 */}
         {activeSection === "advanced" && (
           <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Database className="w-5 h-5 mr-2 text-blue-400" />
                 系统设置
@@ -747,7 +747,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+            <div className="bg-surface-card backdrop-blur-sm border border-glass rounded-2xl p-6">
               <h3 className="text-lg font-medium text-white mb-4 flex items-center">
                 <Upload className="w-5 h-5 mr-2 text-green-400" />
                 设置备份
