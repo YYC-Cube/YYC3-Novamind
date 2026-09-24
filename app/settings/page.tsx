@@ -2,26 +2,36 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
+import {
+  applyTheme,
+  resetTheme,
+  restoreTheme,
+  type ThemePack,
+} from "@/lib/theme-schema"
+import { gestureUtils, voiceUtils } from "@/lib/utils"
 import {
   ArrowLeft,
-  Settings,
-  Palette,
-  Eye,
-  Hand,
-  Mic,
-  Moon,
-  Sun,
-  Monitor,
-  Globe,
-  Shield,
+  Check,
   Database,
-  Trash2,
   Download,
+  Eye,
+  Globe,
+  Hand,
+  Loader2,
+  Mic,
+  Monitor,
+  Moon,
+  Palette,
+  RotateCcw,
+  Settings,
+  Shield,
+  Sparkles,
+  Sun,
+  Trash2,
   Upload,
 } from "lucide-react"
-import { gestureUtils, voiceUtils } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
 
 interface SettingsState {
   // 交互设置
@@ -85,6 +95,82 @@ export default function SettingsPage() {
   const [isListening, setIsListening] = useState(false)
   const [gestureMode, setGestureMode] = useState<"idle" | "swipe">("idle")
   const [hasChanges, setHasChanges] = useState(false)
+
+  // ===== P4-1：AI 一句话换肤 =====
+  const [aiAvailable, setAiAvailable] = useState(false) // 无 Key 隐藏入口（D10 同款降级）
+  const [themePrompt, setThemePrompt] = useState("")
+  const [themePreview, setThemePreview] = useState<ThemePack | null>(null) // 预览态（未持久化）
+  const [appliedTheme, setAppliedTheme] = useState<ThemePack | null>(null) // 已应用
+  const [isGeneratingTheme, setIsGeneratingTheme] = useState(false)
+  const [themeError, setThemeError] = useState<string | null>(null)
+
+  // 挂载：探测 AI 可用性 + 恢复持久化主题（setState 在微任务中，非 effect 同步）
+  useEffect(() => {
+    void Promise.resolve().then(async () => {
+      try {
+        const res = await fetch("/api/ai?action=providers")
+        const json = (await res.json()) as { data?: string[] }
+        setAiAvailable(Array.isArray(json.data) && json.data.length > 0)
+      } catch {
+        setAiAvailable(false)
+      }
+      const restored = restoreTheme()
+      if (restored) setAppliedTheme(restored)
+    })
+  }, [])
+
+  /** 生成 → 校验通过后先预览（applyTheme 同步写 :root + localStorage，预览与应用一致） */
+  const handleGenerateTheme = async () => {
+    if (!themePrompt.trim() || isGeneratingTheme) return
+    setIsGeneratingTheme(true)
+    setThemeError(null)
+    setThemePreview(null)
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "generate_theme", data: { prompt: themePrompt } }),
+      })
+      const json = (await res.json()) as {
+        success: boolean
+        data?: ThemePack
+        error?: { message?: string }
+      }
+      if (!json.success || !json.data) {
+        throw new Error(json.error?.message ?? "主题生成失败")
+      }
+      applyTheme(json.data)
+      setThemePreview(json.data)
+    } catch (e) {
+      setThemeError(e instanceof Error ? e.message : "主题生成失败")
+    } finally {
+      setIsGeneratingTheme(false)
+    }
+  }
+
+  const handleKeepTheme = () => {
+    if (themePreview) setAppliedTheme(themePreview)
+    setThemePreview(null)
+    setThemePrompt("")
+  }
+
+  /** 预览不满意 → 恢复上次已应用主题（或默认） */
+  const handleDiscardPreview = () => {
+    if (appliedTheme) {
+      applyTheme(appliedTheme)
+    } else {
+      resetTheme()
+    }
+    setThemePreview(null)
+  }
+
+  const handleResetTheme = () => {
+    resetTheme()
+    setAppliedTheme(null)
+    setThemePreview(null)
+    setThemePrompt("")
+  }
+  // ===== P4-1 结束 =====
 
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -313,11 +399,10 @@ export default function SettingsPage() {
             <button
               key={key}
               onClick={() => setActiveSection(key as any)}
-              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                activeSection === key
-                  ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
-              }`}
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors ${activeSection === key
+                ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
+                : "text-gray-400 hover:text-white hover:bg-white/10"
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span className="text-sm font-medium">{label}</span>
@@ -342,14 +427,12 @@ export default function SettingsPage() {
                   <span className="text-gray-300">启用语音控制</span>
                   <button
                     onClick={() => updateSetting("voiceEnabled", !settings.voiceEnabled)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.voiceEnabled ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.voiceEnabled ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.voiceEnabled ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.voiceEnabled ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -382,14 +465,12 @@ export default function SettingsPage() {
                   <span className="text-gray-300">启用手势识别</span>
                   <button
                     onClick={() => updateSetting("gestureEnabled", !settings.gestureEnabled)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.gestureEnabled ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.gestureEnabled ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.gestureEnabled ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.gestureEnabled ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -422,14 +503,12 @@ export default function SettingsPage() {
                   <span className="text-gray-300">眼动追踪</span>
                   <button
                     onClick={() => updateSetting("eyeTrackingEnabled", !settings.eyeTrackingEnabled)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.eyeTrackingEnabled ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.eyeTrackingEnabled ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.eyeTrackingEnabled ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.eyeTrackingEnabled ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -438,14 +517,12 @@ export default function SettingsPage() {
                   <span className="text-gray-300">触觉反馈</span>
                   <button
                     onClick={() => updateSetting("hapticFeedback", !settings.hapticFeedback)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.hapticFeedback ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.hapticFeedback ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.hapticFeedback ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.hapticFeedback ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -475,11 +552,10 @@ export default function SettingsPage() {
                       <button
                         key={key}
                         onClick={() => updateSetting("theme", key as any)}
-                        className={`flex items-center justify-center space-x-2 p-3 rounded-lg transition-colors ${
-                          settings.theme === key
-                            ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
-                            : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
-                        }`}
+                        className={`flex items-center justify-center space-x-2 p-3 rounded-lg transition-colors ${settings.theme === key
+                          ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
+                          : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                          }`}
                       >
                         <Icon className="w-4 h-4" />
                         <span className="text-sm">{label}</span>
@@ -499,11 +575,10 @@ export default function SettingsPage() {
                       <button
                         key={key}
                         onClick={() => updateSetting("fontSize", key as any)}
-                        className={`p-3 rounded-lg transition-colors ${
-                          settings.fontSize === key
-                            ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
-                            : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
-                        }`}
+                        className={`p-3 rounded-lg transition-colors ${settings.fontSize === key
+                          ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
+                          : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                          }`}
                       >
                         <span className={`${key === "small" ? "text-sm" : key === "large" ? "text-lg" : "text-base"}`}>
                           {label}
@@ -524,17 +599,101 @@ export default function SettingsPage() {
                       <button
                         key={key}
                         onClick={() => updateSetting("animationSpeed", key as any)}
-                        className={`p-3 rounded-lg transition-colors ${
-                          settings.animationSpeed === key
-                            ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
-                            : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
-                        }`}
+                        className={`p-3 rounded-lg transition-colors ${settings.animationSpeed === key
+                          ? "bg-purple-500/20 text-purple-400 border border-purple-400/30"
+                          : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                          }`}
                       >
                         <span className="text-sm">{label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
+
+                {/* P4-1：AI 一句话换肤（无 Key 时隐藏，D10 同款降级） */}
+                {aiAvailable && (
+                  <div className="pt-4 border-t border-glass-soft">
+                    <label className="flex items-center gap-2 text-gray-300 mb-2">
+                      <Sparkles className="w-4 h-4 text-purple-400" />
+                      AI 一句话换肤
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        value={themePrompt}
+                        onChange={(e) => setThemePrompt(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") void handleGenerateTheme()
+                        }}
+                        placeholder="描述你想要的主题，如「海洋风格」"
+                        className="flex-1 bg-white/5 border border-glass rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-400"
+                      />
+                      <button
+                        onClick={() => void handleGenerateTheme()}
+                        disabled={isGeneratingTheme || !themePrompt.trim()}
+                        className="flex items-center gap-1.5 bg-brand hover:bg-[var(--brand-primary-hover)] disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                      >
+                        {isGeneratingTheme ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-4 h-4" />
+                        )}
+                        生成
+                      </button>
+                    </div>
+
+                    {themeError && <p className="mt-2 text-xs text-red-400">{themeError}</p>}
+
+                    {/* 预览态：主题包色卡 + 采纳/放弃 */}
+                    {themePreview && (
+                      <div className="mt-3 bg-white/5 border border-glass rounded-xl p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-white">{themePreview.name}</span>
+                          <div className="flex gap-1">
+                            {[themePreview.primary, themePreview.gradientFrom, themePreview.gradientTo].map((c) => (
+                              <span
+                                key={c}
+                                className="w-5 h-5 rounded-full border border-white/20"
+                                style={{ backgroundColor: c }}
+                                title={c}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleKeepTheme}
+                            className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            采纳
+                          </button>
+                          <button
+                            onClick={handleDiscardPreview}
+                            className="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-gray-300 px-3 py-1.5 rounded-lg text-xs"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            放弃
+                          </button>
+                          <span className="text-xs text-gray-500">已实时预览，采纳后生效</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 已应用主题：可重置回默认 */}
+                    {appliedTheme && !themePreview && (
+                      <div className="mt-3 flex items-center justify-between bg-white/5 border border-glass rounded-xl px-3 py-2">
+                        <span className="text-xs text-gray-400">当前主题：{appliedTheme.name}</span>
+                        <button
+                          onClick={handleResetTheme}
+                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          重置默认
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -554,11 +713,10 @@ export default function SettingsPage() {
                     <button
                       key={key}
                       onClick={() => updateSetting("language", key as any)}
-                      className={`p-3 rounded-lg transition-colors ${
-                        settings.language === key
-                          ? "bg-blue-500/20 text-blue-400 border border-blue-400/30"
-                          : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
-                      }`}
+                      className={`p-3 rounded-lg transition-colors ${settings.language === key
+                        ? "bg-blue-500/20 text-blue-400 border border-blue-400/30"
+                        : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                        }`}
                     >
                       <span className="text-sm">{label}</span>
                     </button>
@@ -586,14 +744,12 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => updateSetting("dataCollection", !settings.dataCollection)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.dataCollection ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.dataCollection ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.dataCollection ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.dataCollection ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -605,14 +761,12 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => updateSetting("personalizedRecommendations", !settings.personalizedRecommendations)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.personalizedRecommendations ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.personalizedRecommendations ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.personalizedRecommendations ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.personalizedRecommendations ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -624,14 +778,12 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => updateSetting("voiceDataStorage", !settings.voiceDataStorage)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.voiceDataStorage ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.voiceDataStorage ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.voiceDataStorage ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.voiceDataStorage ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -643,14 +795,12 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => updateSetting("analyticsEnabled", !settings.analyticsEnabled)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.analyticsEnabled ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.analyticsEnabled ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.analyticsEnabled ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.analyticsEnabled ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -695,14 +845,12 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => updateSetting("autoSave", !settings.autoSave)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.autoSave ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.autoSave ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.autoSave ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.autoSave ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -714,14 +862,12 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => updateSetting("offlineMode", !settings.offlineMode)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.offlineMode ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.offlineMode ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.offlineMode ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.offlineMode ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>
@@ -733,14 +879,12 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => updateSetting("debugMode", !settings.debugMode)}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.debugMode ? "bg-green-500" : "bg-gray-600"
-                    }`}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${settings.debugMode ? "bg-green-500" : "bg-gray-600"
+                      }`}
                   >
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        settings.debugMode ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${settings.debugMode ? "translate-x-6" : "translate-x-0.5"
+                        }`}
                     />
                   </button>
                 </div>

@@ -2,6 +2,7 @@ import { auth } from "@/auth.config"
 import { RealAIService, type AIResponse } from "@/lib/ai-service-real"
 import { EnhancedErrorHandler, ErrorSeverity, ErrorType } from "@/lib/error-handler"
 import { PerformanceOptimizer } from "@/lib/performance-optimizer"
+import { themeSchema, type ThemePack } from "@/lib/theme-schema"
 import { recordTokenUsage } from "@/lib/usage"
 import { NextResponse, type NextRequest } from "next/server"
 
@@ -185,6 +186,97 @@ export async function POST(request: NextRequest) {
             provider: provider || RealAIService.getCurrentProvider(),
           },
         })
+
+      case "generate_theme": {
+        // P4-1：AI 一句话换肤 — LLM 结构化输出主题包 → zod 校验
+        const { prompt } = (data ?? {}) as { prompt?: string }
+        if (!prompt || typeof prompt !== "string" || prompt.trim().length === 0) {
+          throw EnhancedErrorHandler.createError(
+            ErrorType.VALIDATION,
+            "换肤描述不能为空",
+            { action, data },
+            ErrorSeverity.MEDIUM,
+          )
+        }
+        if (RealAIService.getAvailableProviders().length === 0) {
+          throw EnhancedErrorHandler.createError(
+            ErrorType.AI_SERVICE,
+            "AI 服务未配置（缺少 API Key），换肤功能不可用",
+            { action },
+            ErrorSeverity.MEDIUM,
+          )
+        }
+
+        const themeStart = Date.now()
+        const themeResponse = await EnhancedErrorHandler.withRetry(
+          () =>
+            RealAIService.chat(
+              [
+                {
+                  role: "system",
+                  content:
+                    "你是 UI 主题设计师。根据用户描述输出一个 JSON 主题包，字段：" +
+                    "name（主题名，≤30字）、primary 与 primaryHover（品牌主色与悬停色，#RRGGBB）、" +
+                    "gradientFrom 与 gradientTo（标题渐变两端色，#RRGGBB）、" +
+                    "glowRgb（主色发光阴影的 RGB 三元组字符串，如 \"56 189 248\"）、" +
+                    "radius（\"soft\"|\"standard\"|\"sharp\"）、fontWeight（\"light\"|\"normal\"|\"bold\"）。" +
+                    "只输出 JSON 对象本身，不要任何解释或代码块标记。",
+                },
+                { role: "user", content: `主题描述：${prompt.trim()}` },
+              ],
+              { temperature: 0.7, maxTokens: 300 },
+            ),
+          "ai_generate_theme",
+          3,
+        )
+
+        // 解析 + zod 校验（容忍 ```json 围栏）
+        const rawText = themeResponse.content.trim().replace(/^```(?:json)?\s*|\s*```$/g, "")
+        let candidate: unknown
+        try {
+          candidate = JSON.parse(rawText)
+        } catch {
+          throw EnhancedErrorHandler.createError(
+            ErrorType.AI_SERVICE,
+            "AI 返回的主题包格式无法解析，请换个描述重试",
+            { rawPreview: rawText.slice(0, 120) },
+            ErrorSeverity.MEDIUM,
+          )
+        }
+        const parsed = themeSchema.safeParse(candidate)
+        if (!parsed.success) {
+          throw EnhancedErrorHandler.createError(
+            ErrorType.AI_SERVICE,
+            "AI 返回的主题包校验未通过，请重试",
+            { issues: parsed.error.issues.slice(0, 5) },
+            ErrorSeverity.MEDIUM,
+          )
+        }
+        const themePack: ThemePack = parsed.data
+
+        const themeProcessingTime = Date.now() - themeStart
+        PerformanceOptimizer.recordOperationTime("ai_generate_theme", themeProcessingTime)
+
+        // 资产 9：用量持久化（旁挂记录，失败静默）
+        const themeSession = await auth()
+        await recordTokenUsage({
+          userId: themeSession?.user?.id ?? null,
+          provider: RealAIService.getCurrentProvider(),
+          model: themeResponse.model,
+          inputTokens: themeResponse.usage.promptTokens,
+          outputTokens: themeResponse.usage.completionTokens,
+          latencyMs: themeProcessingTime,
+        })
+
+        return NextResponse.json({
+          success: true,
+          data: themePack,
+          metadata: {
+            processingTime: themeProcessingTime,
+            provider: RealAIService.getCurrentProvider(),
+          },
+        })
+      }
 
       case "stream_chat":
         // 流式聊天需要使用不同的响应方式
