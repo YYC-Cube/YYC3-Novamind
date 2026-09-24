@@ -6,13 +6,20 @@
  *
  * Agent 循环：generateText({ tools, stopWhen: stepCountIs(N) }) — 外科手术式多步控制
  */
+import { auth } from "@/auth.config"
+import { formatKnowledgeContext, truncateToolResults } from "@/lib/context-engine"
 import { MindMapManager } from "@/lib/mindmap"
 import { PosterGenerator } from "@/lib/poster-generator"
 import { searchKnowledgeBase } from "@/lib/rag"
+import { recordTokenUsage } from "@/lib/usage"
 import { WebpageGenerator } from "@/lib/webpage-generator"
 import { openai } from "@ai-sdk/openai"
 import { generateText, stepCountIs, tool } from "ai"
 import { z } from "zod"
+
+/** Agent 默认 system 提示词（资产 5 原文抽常量，供 RAG 注入拼接） */
+export const DEFAULT_AGENT_SYSTEM =
+  "你是 NovaMind 智能助手。善用工具完成任务：结构化知识用 generateMindmap，视觉宣传用 generatePoster，网页需求用 generateWebpage，需要项目知识时先 searchKnowledge。回答使用中文。"
 
 // ─────────────────────────── 入参 Schema 注册表 ───────────────────────────
 // 单一事实源：tool() 定义 / MCP 供方（app/api/mcp/route.ts）共用原始 Zod schema
@@ -139,20 +146,46 @@ export async function runAgent(
   options: { maxSteps?: number; temperature?: number; system?: string } = {},
 ): Promise<AgentRunResult> {
   const { maxSteps = 5, temperature = 0.7 } = options
+  const agentStart = Date.now()
 
   // MCP 外部工具并入（MCP_SERVERS 缺失时直通内置四工具）
   const toolset = await buildAgentToolset()
 
+  // 资产 10：RAG 知识注入（DSN 驱动降级 — 无 DB/未命中时 system 不变）
+  let system = options.system ?? DEFAULT_AGENT_SYSTEM
+  try {
+    const { chunks, degraded } = await searchKnowledgeBase(prompt, 3)
+    if (!degraded && chunks.length > 0) {
+      system = `${system}\n\n${formatKnowledgeContext(chunks)}`
+    }
+  } catch (e) {
+    console.warn("[agent] RAG 注入失败（跳过）:", e)
+  }
+
   try {
     const result = await generateText({
       model: openai(process.env.OPENAI_MODEL ?? "gpt-4o"),
-      system:
-        options.system ??
-        "你是 NovaMind 智能助手。善用工具完成任务：结构化知识用 generateMindmap，视觉宣传用 generatePoster，网页需求用 generateWebpage，需要项目知识时先 searchKnowledge。回答使用中文。",
+      system,
       prompt,
       tools: toolset.tools as typeof aiTools,
       stopWhen: stepCountIs(maxSteps),
       temperature,
+      // 资产 10：每步动态裁剪超长工具结果（截头保尾，尾部含最新执行上下文）
+      prepareStep: ({ messages }) => {
+        const trimmed = truncateToolResults(messages)
+        return trimmed > 0 ? { messages } : undefined
+      },
+    })
+
+    // 资产 9：Agent 用量持久化（多步聚合为一条记录，旁挂失败静默）
+    const session = await auth()
+    await recordTokenUsage({
+      userId: session?.user?.id ?? null,
+      provider: "openai",
+      model: process.env.OPENAI_MODEL ?? "gpt-4o",
+      inputTokens: result.usage?.inputTokens ?? 0,
+      outputTokens: result.usage?.outputTokens ?? 0,
+      latencyMs: Date.now() - agentStart,
     })
 
     return {

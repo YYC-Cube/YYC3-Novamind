@@ -76,9 +76,24 @@ export const chunks = pgTable("chunks", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 })
 
+// ── 成本观测（Phase D · 文档 06 资产 9：usage_logs 持久化用量）──
+export const usageLogs = pgTable("usage_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  provider: varchar("provider", { length: 50 }).notNull().default("openai"),
+  model: varchar("model", { length: 100 }).notNull(),
+  inputTokens: integer("input_tokens").notNull().default(0),
+  outputTokens: integer("output_tokens").notNull().default(0),
+  latencyMs: integer("latency_ms"),
+  // 冗余日期键（UTC yyyy-mm-dd），按日聚合免走函数索引
+  usageDate: varchar("usage_date", { length: 10 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+})
+
 export type User = typeof users.$inferSelect
 export type Chat = typeof chats.$inferSelect
 export type Message = typeof messages.$inferSelect
 export type Feedback = typeof feedback.$inferSelect
 export type Document = typeof documents.$inferSelect
 export type Chunk = typeof chunks.$inferSelect
+export type UsageLog = typeof usageLogs.$inferSelect

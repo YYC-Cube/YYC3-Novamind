@@ -1,7 +1,9 @@
-import { RealAIService } from "@/lib/ai-service-real"
+import { auth } from "@/auth.config"
+import { RealAIService, type AIResponse } from "@/lib/ai-service-real"
 import { EnhancedErrorHandler, ErrorSeverity, ErrorType } from "@/lib/error-handler"
 import { PerformanceOptimizer } from "@/lib/performance-optimizer"
-import { type NextRequest, NextResponse } from "next/server"
+import { recordTokenUsage } from "@/lib/usage"
+import { NextResponse, type NextRequest } from "next/server"
 
 // 初始化AI服务
 RealAIService.loadFromEnvironment()
@@ -164,6 +166,17 @@ export async function POST(request: NextRequest) {
         const processingTime = Date.now() - startTime
         PerformanceOptimizer.recordOperationTime("ai_chat", processingTime)
 
+        // 资产 9：用量持久化（旁挂记录，失败静默）
+        const session = await auth()
+        await recordTokenUsage({
+          userId: session?.user?.id ?? null,
+          provider: provider || RealAIService.getCurrentProvider(),
+          model: response.model,
+          inputTokens: response.usage.promptTokens,
+          outputTokens: response.usage.completionTokens,
+          latencyMs: processingTime,
+        })
+
         return NextResponse.json({
           success: true,
           data: response,
@@ -194,12 +207,15 @@ export async function POST(request: NextRequest) {
 
         // 创建流式响应
         const encoder = new TextEncoder()
+        const streamStart = Date.now()
         const stream = new ReadableStream({
           async start(controller) {
             try {
+              let lastUsage: AIResponse["usage"] | undefined
               await RealAIService.streamChat(
                 streamMessages,
                 (chunk) => {
+                  if (chunk.usage) lastUsage = chunk.usage
                   const data = JSON.stringify(chunk)
                   controller.enqueue(encoder.encode(`data: ${data}\n\n`))
                 },
@@ -210,6 +226,17 @@ export async function POST(request: NextRequest) {
                   model: streamModel,
                 },
               )
+
+              // 资产 9：流式用量持久化（旁挂记录，失败静默）
+              const session = await auth()
+              await recordTokenUsage({
+                userId: session?.user?.id ?? null,
+                provider: streamProvider || RealAIService.getCurrentProvider(),
+                model: streamModel || process.env.OPENAI_MODEL || "gpt-4o",
+                inputTokens: lastUsage?.promptTokens ?? 0,
+                outputTokens: lastUsage?.completionTokens ?? 0,
+                latencyMs: Date.now() - streamStart,
+              })
 
               controller.enqueue(encoder.encode("data: [DONE]\n\n"))
               controller.close()

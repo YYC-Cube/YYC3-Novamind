@@ -1092,7 +1092,13 @@ export class GlobalAuditSystem {
       if (stored) {
         const data = JSON.parse(stored)
         if (data.auditResults) {
-          this.auditResults = new Map(data.auditResults)
+          // JSON 反序列化后 auditDate 是字符串，还原为 Date（否则 .getTime()/.toLocaleDateString() 会崩溃）
+          this.auditResults = new Map(
+            (data.auditResults as [string, AuditResult][]).map(([id, audit]) => [
+              id,
+              { ...audit, auditDate: new Date(audit.auditDate) },
+            ])
+          )
         }
         if (data.auditDimensions) {
           this.auditDimensions = data.auditDimensions

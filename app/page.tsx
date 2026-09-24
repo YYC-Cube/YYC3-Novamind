@@ -1,8 +1,25 @@
 "use client"
 
-import { Brain, Eye, Hand, Mic, Search, Sparkles, Zap } from "lucide-react"
+import { Activity, BookOpen, Brain, Eye, Globe, Hand, History, ImageIcon, LayoutTemplate, Mic, Network, Presentation, Search, ShieldCheck, Sparkles, Star, Zap } from "lucide-react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
+
+/** 功能菜单：核心能力统一入口（路由与全站页面 1:1 对齐） */
+const featureMenu = [
+  { label: "智能搜索", desc: "多模态检索", icon: Search, href: "/search" },
+  { label: "思维导图", desc: "结构化知识", icon: Brain, href: "/generate/mindmap" },
+  { label: "海报生成", desc: "六主题 SVG", icon: ImageIcon, href: "/generate/poster" },
+  { label: "PPT 生成", desc: "演示文稿", icon: Presentation, href: "/generate/ppt" },
+  { label: "网页生成", desc: "单页落地", icon: Globe, href: "/generate/webpage" },
+  { label: "学习路径", desc: "个性化规划", icon: BookOpen, href: "/learning-path/create" },
+  { label: "知识图谱", desc: "关联探索", icon: Network, href: "/knowledge-graph" },
+  { label: "历史记录", desc: "会话回溯", icon: History, href: "/history" },
+  { label: "收藏夹", desc: "内容管理", icon: Star, href: "/favorites" },
+  { label: "模板中心", desc: "快速起步", icon: LayoutTemplate, href: "/templates" },
+  { label: "系统状态", desc: "服务健康", icon: Activity, href: "/system-status" },
+  { label: "全局审核", desc: "多维度评估", icon: ShieldCheck, href: "/global-audit-home" },
+]
 
 export default function HomePage() {
   const [query, setQuery] = useState("")
@@ -12,6 +29,7 @@ export default function HomePage() {
   const [voiceCommand, setVoiceCommand] = useState("")
   const [contextualActions, setContextualActions] = useState<string[]>([])
   const [userIntent, setUserIntent] = useState<"search" | "generate" | "learn" | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -263,33 +281,102 @@ export default function HomePage() {
         background: `radial-gradient(circle at ${isGazing ? "50% 50%" : "30% 70%"}, rgba(139, 92, 246, 0.3) 0%, transparent 50%)`,
       }}
     >
-      {/* 动态背景粒子 */}
+      {/* 动态背景粒子（确定性伪随机：SSR 与客户端输出一致，避免水合不匹配） */}
       <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 50 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white/20 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          />
-        ))}
+        {Array.from({ length: 50 }).map((_, i) => {
+          // mulberry32 种子序列：每个粒子取 4 个确定值（index 驱动，两端一致）
+          const rand = (seed: number) => {
+            const t = (seed + 0x6d2b79f5) | 0
+            let x = Math.imul(t ^ (t >>> 15), 1 | t)
+            x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x
+            return ((x ^ (x >>> 14)) >>> 0) / 4294967296
+          }
+          const base = i * 4
+          return (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white/20 rounded-full animate-pulse"
+              style={{
+                left: `${rand(base) * 100}%`,
+                top: `${rand(base + 1) * 100}%`,
+                animationDelay: `${rand(base + 2) * 3}s`,
+                animationDuration: `${2 + rand(base + 3) * 3}s`,
+              }}
+            />
+          )
+        })}
       </div>
 
       {/* 主要内容区域 */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-16">
+        {/* 顶部品牌栏：logo + 名称 + 功能菜单入口 */}
+        <div className="absolute top-6 left-6 flex items-center gap-3">
+          <Image
+            src="/yyc3-icons/Web App/android-chrome-192.png"
+            alt="NovaMind 星图智语 Logo"
+            width={40}
+            height={40}
+            className="rounded-xl shadow-lg shadow-purple-500/30"
+            priority
+          />
+          <div className="leading-tight">
+            <div className="text-white font-semibold">NovaMind</div>
+            <div className="text-gray-400 text-xs">星图智语</div>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-expanded={menuOpen}
+          aria-label="功能菜单"
+          className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 text-white text-sm transition-all duration-300 hover:bg-white/20 hover:scale-105"
+        >
+          <LayoutTemplate className="w-4 h-4" />
+          功能菜单
+        </button>
+
+        {/* 功能菜单面板（12 项核心能力统一入口） */}
+        {menuOpen && (
+          <div className="absolute top-20 right-6 z-20 w-[min(92vw,560px)] max-h-[70vh] overflow-y-auto bg-slate-900/90 backdrop-blur-2xl rounded-3xl border border-white/15 shadow-2xl shadow-purple-500/20 p-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {featureMenu.map((item) => (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    router.push(item.href)
+                  }}
+                  className="group flex flex-col items-start gap-1.5 p-4 bg-white/5 hover:bg-white/15 rounded-2xl border border-white/10 text-left transition-all duration-200 hover:scale-[1.03]"
+                >
+                  <item.icon className="w-5 h-5 text-purple-300 group-hover:text-purple-200" />
+                  <div className="text-white text-sm font-medium">{item.label}</div>
+                  <div className="text-gray-400 text-xs">{item.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* 标题区域 - 响应式动画 */}
         <div
           className={`text-center mb-12 transition-all duration-1000 ${query ? "transform -translate-y-8 scale-90" : ""
             }`}
         >
-          <h1 className="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-6">
-            YYC³ AI
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-4">无边界智能交互中心</p>
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <Image
+              src="/yyc3-icons/Web App/android-chrome-192.png"
+              alt="NovaMind Logo"
+              width={64}
+              height={64}
+              className="rounded-2xl shadow-xl shadow-purple-500/40"
+              priority
+            />
+            <h1 className="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+              NovaMind
+            </h1>
+          </div>
+          <p className="text-xl md:text-2xl text-gray-300 mb-4">星图智语 · 无边界智能交互中心</p>
           <div className="flex items-center justify-center space-x-4 text-sm text-gray-400">
             <span className={`flex items-center ${isListening ? "text-red-400" : ""}`}>
               <Mic className="w-4 h-4 mr-1" />

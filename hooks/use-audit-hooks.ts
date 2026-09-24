@@ -50,9 +50,16 @@ export function useAuditProgress() {
 
 // 实时状态监控钩子
 export function useAuditStatusMonitor() {
-  const [status, setStatus] = useState({
+  // lastCheck 初始为 null：避免 SSR 与客户端 new Date() 值不一致导致水合不匹配
+  const [status, setStatus] = useState<{
+    isHealthy: boolean
+    lastCheck: Date | null
+    activeAudits: number
+    queuedAudits: number
+    systemLoad: number
+  }>({
     isHealthy: true,
-    lastCheck: new Date(),
+    lastCheck: null,
     activeAudits: 0,
     queuedAudits: 0,
     systemLoad: 0

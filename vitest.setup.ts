@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
-import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
+import { afterEach, vi } from 'vitest'
 
 // 每个测试后自动清理 DOM
 afterEach(() => {
@@ -29,6 +29,17 @@ vi.mock('next/image', () => ({
     return React.createElement('img', props)
   },
 }))
+
+// Mock next-auth：避免 auth.config.ts 传递引入 next/server 的 ESM 解析问题（vitest v4 环境）
+vi.mock('next-auth', () => {
+  const auth = vi.fn(async () => null)
+  return {
+    default: vi.fn(() => ({ handlers: {}, auth, signIn: vi.fn(), signOut: vi.fn() })),
+    auth,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+  }
+})
 
 // 环境变量占位
 process.env.NEXT_PUBLIC_APP_NAME = 'YYC³ NovaMind'

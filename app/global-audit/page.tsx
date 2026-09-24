@@ -136,7 +136,7 @@ export default function GlobalAuditDashboard() {
               负载: {Math.round(systemStatus.systemLoad)}%
             </div>
             <div className="text-sm text-gray-600">
-              最后检查: {systemStatus.lastCheck.toLocaleTimeString()}
+              最后检查: {systemStatus.lastCheck ? systemStatus.lastCheck.toLocaleTimeString() : "—"}
             </div>
           </div>
         </div>

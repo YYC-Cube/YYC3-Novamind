@@ -39,12 +39,12 @@ export default defineConfig({
         'node_modules/**',
       ],
       thresholds: {
-        // 全局棘轮基线 — Phase B 收紧（2026-09-19，129 用例实测 8.76）：
-        // 前值 7/6/9/7 → 新增 api-guard/rag-tools 用例后整体抬升
-        statements: 8.5,
-        branches: 7,
-        functions: 11,
-        lines: 8.5,
+        // 全局棘轮基线 — Phase D 收紧（2026-09-24，166 用例实测 9.6+）：
+        // 前值 9/7.5/11.5/9 → 新增 context-engine.ts（19 用例）后整体抬升
+        statements: 9.5,
+        branches: 8,
+        functions: 12,
+        lines: 9.5,
         // 核心域逐文件硬门禁 — vitest 4 重校准（v4 口径较 v3 低 2~20 个百分点）
         'lib/auth.ts': { lines: 58, functions: 70 },
         'lib/conversation.ts': { lines: 76, functions: 73 },
@@ -55,6 +55,10 @@ export default defineConfig({
         'lib/local-llm-config.ts': { lines: 95, functions: 95 },
         // Phase A/B 新资产门禁
         'lib/api-guard.ts': { lines: 60, functions: 70 },
+        // Phase D 资产 9：成本观测层
+        'lib/usage.ts': { lines: 95, functions: 100 },
+        // Phase D 资产 10：上下文工程
+        'lib/context-engine.ts': { lines: 95, functions: 100 },
       },
     },
     css: false,

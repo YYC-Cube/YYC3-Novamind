@@ -1,7 +1,11 @@
+import { auth } from "@/auth.config"
 import { recordUsage, withGuard } from "@/lib/api-guard"
+import { buildContext, formatKnowledgeContext } from "@/lib/context-engine"
 import { getDb, isDbEnabled } from "@/lib/db"
 import { chats, messages as messagesTable, users } from "@/lib/db/schema"
 import { EnhancedErrorHandler, ErrorSeverity, ErrorType } from "@/lib/error-handler"
+import { searchKnowledgeBase } from "@/lib/rag"
+import { recordTokenUsage } from "@/lib/usage"
 import { ChatRequestSchema } from "@/openapi/schemas"
 import { openai } from "@ai-sdk/openai"
 import { generateText } from "ai"
@@ -35,13 +39,31 @@ export const POST = withGuard(async (request: Request) => {
     const { messages, temperature = 0.7, maxTokens = 2000 } = parsed.data
     const startTime = Date.now()
 
+    // 资产 10：上下文工程 — 分区/摘要压缩 + RAG 知识注入（全链路降级安全）
+    let knowledgeContext = ""
+    try {
+      const lastUser = [...messages].reverse().find((m) => m.role === "user")
+      if (lastUser) {
+        const { chunks, degraded } = await searchKnowledgeBase(lastUser.content, 3)
+        if (!degraded && chunks.length > 0) {
+          knowledgeContext = formatKnowledgeContext(chunks)
+        }
+      }
+    } catch (e) {
+      console.warn("[chat] RAG 注入失败（跳过）:", e)
+    }
+    const built = await buildContext(messages, { knowledgeContext })
+
     // 调用AI生成回复
     const { text, usage } = await generateText({
       model: openai("gpt-4o"),
-      messages: messages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
+      system: built.system || undefined,
+      messages: built.messages
+        .filter((m) => m.role !== "system")
+        .map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+        })),
       temperature,
       // AI SDK v5: maxTokens 已更名为 maxOutputTokens（外部 API 契约字段名保持 maxTokens）
       maxOutputTokens: maxTokens,
@@ -50,6 +72,17 @@ export const POST = withGuard(async (request: Request) => {
     const responseTime = Date.now() - startTime
     const totalTokens = usage?.totalTokens ?? 0
     recordUsage(totalTokens) // 成本闸回写实际用量
+
+    // 资产 9：用量持久化（旁挂记录，失败静默；登录用户取真实 ID）
+    const session = await auth()
+    await recordTokenUsage({
+      userId: session?.user?.id ?? null,
+      provider: "openai",
+      model: "gpt-4o",
+      inputTokens: usage?.inputTokens ?? 0,
+      outputTokens: usage?.outputTokens ?? 0,
+      latencyMs: responseTime,
+    })
 
     // 持久化（DSN 驱动：DATABASE_URL 缺失时静默跳过）
     if (isDbEnabled) {
