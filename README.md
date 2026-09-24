@@ -14,16 +14,17 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-50%2B%20components-000000?style=flat-square)](https://ui.shadcn.com/)
 [![Radix UI](https://img.shields.io/badge/Radix_UI-Accessible%20Primitives-7B61FF?style=flat-square)](https://www.radix-ui.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-2-729E1C?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-4-729E1C?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![Sentry](https://img.shields.io/badge/Sentry-Monitoring-362d59?style=flat-square&logo=sentry)](https://sentry.io/)
 [![pnpm](https://img.shields.io/badge/pnpm-9-F69220?style=flat-square&logo=pnpm)](https://pnpm.io/)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/YYC-Cube/YYC3-Novamind/ci.yml?style=flat-square&label=CI%20Pipeline)](https://github.com/YYC-Cube/YYC3-Novamind/actions/workflows/ci.yml)
 [![Typecheck](https://img.shields.io/badge/tsc%20--noEmit-0%20error-3DDC84?style=flat-square)](./package.json)
 [![ESLint](https://img.shields.io/badge/ESLint%20flat--config-0%20error-4B32C3?style=flat-square&logo=eslint)](./eslint.config.mjs)
-[![Tests](https://img.shields.io/badge/tests-111%20passed-3DDC84?style=flat-square&logo=vitest)](./lib/__tests__)
+[![Tests](https://img.shields.io/badge/tests-136%20passed-3DDC84?style=flat-square&logo=vitest)](./lib/__tests__)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-SSOT%20Drift%20Gate-6BA539?style=flat-square&logo=openapiinitiative)](./public/docs/openapi.generated.yaml)
-[![Coverage Gate](https://img.shields.io/badge/coverage-core%20%E2%89%A560%25-3DDC84?style=flat-square)](./vitest.config.ts)
+[![Coverage Gate](https://img.shields.io/badge/coverage-ratchet%20PASS-3DDC84?style=flat-square)](./vitest.config.ts)
+[![MCP](https://img.shields.io/badge/MCP-Bidirectional-000000?style=flat-square)](./app/api/mcp/route.ts)
 
 [![Node](https://img.shields.io/badge/node-%E2%89%A520.18-339933?style=flat-square&logo=nodedotjs)](./package.json)
 [![Port](https://img.shields.io/badge/port-3218- blue?style=flat-square)](#-快速开始)
@@ -40,14 +41,20 @@
 | 模块 | 能力 | 状态 |
 | :----- | :----- | :----: |
 | 🤖 AI 对话 | 多轮对话 · 流式响应 · 多模型支持 · 本地 LLM（Ollama 协议） | ✅ |
+| 🛠️ Agentic 工具循环 | 四大能力工具化 · `runAgent` 多步控制（AI SDK v5 `stopWhen`） | ✅ |
+| 🔌 MCP 双向接入 | 消费外部 MCP server（stdio/http/sse）· 供方端点反向暴露四工具 | ✅ |
+| 🔄 Provider 路由 | 注册制多 Provider · 健康探针 · 链式故障转移 | ✅ |
+| 📚 RAG 知识库 | pgvector 向量 + 全文双路检索 · RRF 融合 · DSN+APIKey 双降级 | ✅ |
+| 💬 反馈闭环 | 消息级 👍/👎 · 幂等 upsert · 标注后台（Annotation 工作流） | ✅ |
 | 🧠 知识图谱 | 可视化图谱 · 智能关联 · 节点探索 | ✅ |
 | 🗺️ 思维导图 | AI 生成 · 多主题 · 交互式编辑 | ✅ |
 | 🎨 内容生成 | 海报 · PPT · 网页 · 一键生成 | ✅ |
 | 📚 学习路径 | 个性化路径 · 进度追踪 · 评估系统 | ✅ |
 | 👥 社区协作 | 内容分享 · 学习小组 · 实时协作 | ✅ |
 | 📊 数据分析 | 使用分析 · 学习洞察 · 预测模型 | ✅ |
-| 🔐 用户系统 | 注册登录 · 权限管理 · 安全认证 | ✅ |
-| 🛡️ 可观测性 | Sentry 错误监控（DSN 驱动）· 契约漂移门禁 | ✅ |
+| 🔐 用户系统 | Auth.js v5 · OAuth 可插拔 · 角色白名单 · API 会话闸门 | ✅ |
+| 🛡️ 生产护栏 | 限流 · 消毒 · 成本闸三件套 · DSN 驱动 Sentry · 契约漂移门禁 | ✅ |
+| 💾 持久化 | Drizzle ORM · 四表 + RAG 向量表 · DSN 驱动优雅降级 | ✅ |
 | 📱 PWA | 离线支持 · 推送通知 · 全端安装 | ✅ |
 
 ---
@@ -63,10 +70,12 @@ YYC³ NovaMind v2.0
 ├── State          React Hooks + Context
 ├── Forms          react-hook-form + zod
 ├── Charts         Recharts
-├── AI             Vercel AI SDK 4 + @ai-sdk/openai 1 + 本地 LLM (Ollama 协议)
+├── AI             Vercel AI SDK 5 + @ai-sdk/openai 2 + @ai-sdk/mcp (MCP 双向) + 本地 LLM (Ollama 协议)
 ├── Icons          Lucide React (50+ UI components)
-├── Testing        Vitest 2 + Testing Library 16 + Playwright 1.63
+├── Testing        Vitest 4 + Testing Library 16 + Playwright 1.63
 ├── Monitoring     @sentry/nextjs 10 (DSN 驱动，双端 instrumentation)
+├── Persistence    drizzle-orm + postgres (DSN 驱动降级) + pgvector (RAG)
+├── Auth           Auth.js v5 (Credentials + GitHub/Google 可插拔)
 ├── API Contract   next-openapi-gen (JSDoc @openapi → OpenAPI 3.0 SSOT)
 ├── CI/CD          GitHub Actions (install → quality[lint+契约+单测] → build)
 ├── Package Mgr    pnpm 9
@@ -83,23 +92,27 @@ graph TB
         SENTRY_C["Sentry 浏览器端<br/>错误 + 回放"]
   end
   subgraph App["⚡ Next.js 16 App Router"]
-        Pages["41+ 页面路由<br/>对话 · 生成 · 学习 · 社区"]
-        API["12 API 域 / 13 路由<br/>ai · chat · auth · sync ..."]
+        Pages["57 页面/路由<br/>对话 · 生成 · 学习 · 社区 · 标注后台"]
+        API["16 API 域<br/>ai · chat · mcp · feedback · auth ..."]
         RSC["RSC + Turbopack<br/>流式渲染"]
         SENTRY_S["Sentry 服务端<br/>onRequestError"]
   end
-  subgraph Core["🧠 核心域 lib/ 48 模块 + 插件扩展"]
-        AI["AI 引擎<br/>对话 · 预测 · 情绪"]
-        Gen["内容生成<br/>PPT · 海报 · 网页 · 导图"]
-        Learn["学习引擎<br/>路径 · 评估 · 图谱"]
-        Infra["基础设施<br/>加密 · 错误处理 · CDN"]
+  subgraph Core["🧠 核心域 lib/（八资产闭环）"]
+        GUARD["资产1 护栏<br/>限流 · 消毒 · 成本闸"]
+        DB["资产2 持久化<br/>Drizzle DSN 降级"]
+        AUTH["资产3 Auth.js v5<br/>API 会话闸门"]
+        TOOLS["资产5 工具循环<br/>runAgent · stopWhen"]
+        ROUTE["资产4 Provider 路由<br/>链式故障转移"]
+        RAG["资产6 RAG<br/>pgvector + RRF"]
+        MCP["资产7 MCP 双向<br/>client + 供方端点"]
+        FB["资产8 反馈闭环<br/>Annotation 后台"]
   end
   subgraph Gate["🛡️ 质量门禁 CI（三阶段）"]
         TS["tsc --noEmit<br/>0 error"]
-        LINT["ESLint flat config<br/>0 error 门禁"]
-        VT["Vitest<br/>111 用例 + 核心域覆盖率 ≥60%"]
+        LINT["ESLint flat config<br/>0 error + 豁免棘轮"]
+        VT["Vitest<br/>136 用例 + 覆盖率棘轮"]
         OA["OpenAPI Drift<br/>契约同源"]
-        BL["next build<br/>41+ 页面"]
+        BL["next build<br/>57 路由"]
   end
   PWA & UI --> Pages
   Pages --> API
@@ -135,16 +148,19 @@ flowchart LR
 ```
 yyc3-novamind/
 ├── app/                          # Next.js App Router
-│   ├── api/                      # 12 API 域 / 13 路由 (29 @openapi 端点)
-│   │   ├── ai/                   #   AI 接口
+│   ├── api/                      # 16 API 域
 │   │   ├── chat/                 #   对话 (含 stream 流式)
-│   │   ├── auth/                 #   认证接口
+│   │   ├── mcp/                  #   MCP 供方端点 (JSON-RPC 2.0)
+│   │   ├── feedback/             #   反馈闭环 (upsert/查询/标注)
+│   │   ├── ai/                   #   AI 接口
+│   │   ├── auth/                 #   Auth.js v5 + 认证接口
 │   │   ├── sync/                 #   跨端同步
 │   │   ├── upload/               #   文件上传
 │   │   ├── speech-to-text/       #   语音识别
 │   │   └── analyze-image/        #   图像分析
 │   ├── api-docs/                 # Swagger UI 契约可视化
 │   ├── auth/                     # 认证页面 (登录/注册/找回密码)
+│   ├── admin/feedback/           # 反馈标注后台 (Annotation)
 │   ├── search/                   # 智能搜索
 │   ├── conversations/            # 对话管理
 │   ├── knowledge-graph/          # 知识图谱
@@ -162,14 +178,24 @@ yyc3-novamind/
 ├── components/
 │   ├── ui/                       # shadcn/ui 组件 (50+)
 │   └── *.tsx                     # 业务组件 (协作/分析/主题)
-├── lib/                          # 核心业务逻辑 (48 模块)
-│   ├── __tests__/                #   单元测试 (111 用例)
+├── lib/                          # 核心业务逻辑
+│   ├── ai-tools.ts               #   Agentic 工具注册表 + runAgent 循环 (资产5)
+│   ├── ai-service-real.ts        #   Provider 注册制 + 链式故障转移 (资产4)
+│   ├── rag.ts                    #   RAG 分块/入库/RRF 混合检索 (资产6)
+│   ├── mcp/client.ts             #   MCP 消费方 client 层 (资产7)
+│   ├── api-guard.ts              #   限流/消毒/成本闸三件套 (资产1)
+│   ├── db/                       #   Drizzle schema + DSN 降级 (资产2)
+│   ├── __tests__/                #   单元测试 (136 用例)
 │   └── _archive/                 #   归档区 (6 个月保留窗)
 ├── hooks/                        # 自定义 Hooks
 ├── openapi/                      # 契约源 (Zod schemas + 类型)
+├── drizzle/                      # 迁移模板 (0000-rag-pgvector.sql)
+├── auth.config.ts                # Auth.js v5 服务端配置 (资产3)
+├── middleware.ts                 # 边缘中间件 (API 写路由会话闸门)
 ├── instrumentation.ts            # Sentry 服务端 (DSN 驱动)
 ├── instrumentation-client.ts     # Sentry 浏览器端
-├── eslint.config.mjs             # ESLint flat config (0 error 门禁)
+├── eslint.config.mjs             # ESLint flat config (0 error + 豁免棘轮)
+├── lint-legacy-allowlist.json    # 存量豁免清单 (只减不增)
 ├── e2e/                          # Playwright E2E
 ├── docs/                         # YYC3-Docs 文档站 + 会话存档
 ├── public/
@@ -222,20 +248,48 @@ pnpm build          # 生产构建（Turbopack + TS 编译门禁）
 pnpm start          # 启动生产服务（端口 3218）
 pnpm typecheck      # TypeScript 严格编译门禁（0 error 基线）
 pnpm lint           # ESLint flat config（0 error 门禁）
-pnpm test           # Vitest 单元测试（111 用例）
-pnpm test:watch     # Vitest 监听模式
-pnpm test:coverage  # 覆盖率报告 + 双轨门禁（全局棘轮 + 核心域逐文件）
+pnpm test            # Vitest 单元测试（136 用例）
+pnpm test:watch      # Vitest 监听模式
+pnpm test:coverage   # 覆盖率报告 + 双轨门禁（全局棘轮 + 逐文件硬门禁）
 pnpm test:ui        # Vitest 交互式 UI
-pnpm test:e2e       # Playwright E2E 测试
-pnpm ci             # 全链路门禁：typecheck + lint + test + build
+pnpm test:e2e        # Playwright E2E 测试
+pnpm ci              # 全链路门禁：typecheck + lint + test + build
 ```
+
+### 环境配置（密钥与数据库）
+
+```bash
+cp .env.example .env.local       # 从模板创建本地环境
+
+# 生成会话密钥（Auth.js v5 必需）
+openssl rand -base64 32          # 输出值填入 .env.local 的 AUTH_SECRET
+
+# 数据库（可选，DSN 驱动降级：不配置则以内存态运行）
+# .env.local 填入 DATABASE_URL 后：
+pnpm db:migrate                              # 四表迁移 (users/chats/messages/feedback)
+psql "$DATABASE_URL" -f drizzle/0000-rag-pgvector.sql   # RAG 向量表 (documents/chunks + HNSW/GIN)
+```
+
+> 完整命令手册（含占位符说明、生产供给清单、一键校验脚本）：[docs/07-生产供给配置手册.md](./docs/yyc3-novamind-m3-20260918/07-生产供给配置手册.md)
 
 ### 监控接入（Sentry，可选）
 
 错误监控采用 **DSN 驱动**设计——不配置则完全静默，零开销：
 
 ```bash
-cp .env.example .env.local   # 填入 NEXT_PUBLIC_SENTRY_DSN / SENTRY_DSN 即激活
+# .env.local 填入 NEXT_PUBLIC_SENTRY_DSN / SENTRY_DSN 即激活
+```
+
+### MCP 生态（资产 7）
+
+NovaMind 同时是 MCP **消费方**与**供方**：
+
+```bash
+# 消费外部 MCP server：.env.local 配置（JSON 数组）
+# MCP_SERVERS=[{"name":"fs","type":"stdio","commandOrUrl":"npx","args":["-y","@modelcontextprotocol/server-filesystem","/tmp"]}]
+
+# 供方端点：POST /api/mcp（JSON-RPC 2.0：initialize → tools/list → tools/call）
+# 可被 Claude Desktop / Cursor 等任意 MCP host 作为工具服务器消费
 ```
 
 ### API 契约（SSOT 单源）
@@ -274,8 +328,9 @@ YYC³ NovaMind 遵循 **五维驱动** 架构理念：
 | [CHANGELOG.md](./CHANGELOG.md) | 版本变更记录（v2.0.0 全量交付清单） |
 | [CONTRIBUTING.md](./CONTRIBUTING.md) | 贡献流程与行为准则 |
 | [docs/YYC3-Docs/](./docs/YYC3-Docs/) | MkDocs 文档站（架构 / CICD / 发布 / 风格指南） |
-| [docs/yyc3-novamind-m3-20260918/](./docs/yyc3-novamind-m3-20260918/) | 会话四件套 + 全维度审核报告（79.5/100 · P0 已清零） |
-| [.env.example](./.env.example) | 环境变量模板（Sentry / AI 服务） |
+| [docs/yyc3-novamind-m3-20260918/](./docs/yyc3-novamind-m3-20260918/) | 会话四件套 + 审核报告 + 同类项目对标资产文档（八资产闭环） |
+| [docs/…/07-生产供给配置手册.md](./docs/yyc3-novamind-m3-20260918/07-生产供给配置手册.md) | 密钥生成 / 数据库配置 / 生产供给命令（占位符版） |
+| [.env.example](./.env.example) | 环境变量模板（Sentry / AI / MCP / RAG） |
 | `/api-docs`（dev 模式） | Swagger UI 在线契约 |
 
 ---

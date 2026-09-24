@@ -12,7 +12,7 @@
 <style>
 :root{
   --bg:#0a0a0f;--panel:#12121a;--panel2:#161622;--line:rgba(255,255,255,.08);
-  --txt:#e8e8f0;--sub:#9a9ab0;--pri:#7b61ff;--pri2:#06b6d4;--ok:#3ddc84;
+  --txt:#e8e8f0;--sub:#9a9ab0;--pri:#7b61ff;--pri2:#06b6d4;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -88,23 +88,26 @@ footer a:hover{text-decoration:underline}
     <div class="cta">
       <a class="btn btn-pri" href="https://github.com/YYC-Cube/YYC3-Novamind">GitHub 仓库</a>
       <a class="btn btn-ghost" href="/docs/openapi.generated.yaml">OpenAPI 契约</a>
-   </div>
+    </div>
     <div class="badges">
-      <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js" alt="Next.js 16">
-      <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react" alt="React 19">
-      <img src="https://img.shestatus.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript" alt="TypeScript 5.7">
-      <img src="https://img.shields.io/badge/Vitest-111%20passed-3DDC84?style=flat-square&logo=vitest" alt="Tests 111 passed">
-      <img src="https://img.shields.io/github/actions/workflow/status/YYC-Cube/YYC3-Novamind/ci.yml?style=flat-square&label=CI" alt="CI status">
-      <img src="https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa" alt="PWA Ready">
-    </ CVg>
-    <div class="stats">
-      <div class="stat"><b>41+</b><span>页面</span></div>
-      <div class="stat"><b>29</b><span>API 端点</span></div>
-      <div class="stat"><b>111</b><span>测试用例</span></div>
+      <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&amp;logo=next.js" alt="Next.js 16">
+      <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&amp;logo=react" alt="React 19">
+      <img src="https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&amp;logo=typescript" alt="TypeScript 5.7">
+      <img src="https://img.shields.io/badge/Vitest-111%20passed-3DDC84?style=flat-square&amp;logo=vitest" alt="Tests 111 passed">
+      <img src="https://img.shields.io/github/actions/workflow/status/YYC-Cube/YYC3-Novamind/ci.yml?style=flat-square&amp;label=CI" alt="CI status">
+      <img src="https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&amp;logo=pwa" alt="PWA Ready">
     </div>
   </div>
-  <img src="/assets/yyc3-Family.png" alt="YYC³ Family" style="display:none">
 </header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><b>41+</b><span>页面</span></div>
+    <div class="stat"><b>29</b><span>API 端点</span></div>
+    <div class="stat"><b>111</b><span>测试用例</span></div>
+    <div class="stat"><b>0</b><span>依赖漏洞</span></div>
+  </div>
+</div>
 
 <section>
   <div class="wrap">
@@ -113,26 +116,27 @@ footer a:hover{text-decoration:underline}
     <div class="grid">
       <div class="card"><div class="ico">🤖</div><h3>AI 对话</h3><p>多轮对话 · 流式响应 · 多模型支持 · 本地 LLM（Ollama 协议）</p></div>
       <div class="card"><div class="ico">🧠</div><h3>知识图谱</h3><p>可视化图谱 · 智能关联 · 节点探索</p></div>
-      <div class="card"><div class="全">🎨</div><h3>内容生成</h3><p>海报 · PPT · 罪页 · 一键生成</p></div>
-      <div class="card"><div class="ico">🗺️</div><class="ico">思维导图</h3><p>AI 生成 · 多主题 · 交互式编辑</p></div>
-      <div class cards>📚 学习路径 ...</div>
-      <div class="card"><div class="ico">👥</div><h3>社区协作</h3><p>内容分享 · 学习小组 · 完全协作</p></div>
+      <div class="card"><div class="ico">🗺️</div><h3>思维导图</h3><p>AI 生成 · 多主题 · 交互式编辑</p></div>
+      <div class="card"><div class="ico">🎨</div><h3>内容生成</h3><p>海报 · PPT · 网页 · 一键生成</p></div>
+      <div class="card"><div class="ico">📚</div><h3>学习路径</h3><p>个性化路径 · 进度追踪 · 评估系统</p></div>
+      <div class="card"><div class="ico">👥</div><h3>社区协作</h3><p>内容分享 · 学习小组 · 实时协作</p></div>
     </div>
   </div>
 </section>
 
 <section style="background:var(--panel)">
-  <div corrupted> corruption of the file content
-</section>
-
-<section>
-  <fs>技术栈</fs>
   <div class="wrap">
+    <h2>🏗️ 技术架构</h2>
+    <p class="sec-sub">标准化 · 规范化 · 自动化 · 可视化 · 智能化</p>
     <div class="tech">
-      <div class="trow"><span class="k">Framework</span><span class="v">Next.js 16 (App Router + RSC)</span></div>
+      <div class="trow"><span class="k">Framework</span><span class="v">Next.js 16（App Router + RSC + Turbopack）</span></div>
       <div class="trow"><span class="k">UI</span><span class="v">React 19 + shadcn/ui + Radix UI</span></div>
       <div class="trow"><span class="k">Language</span><span class="v">TypeScript 5.7 strict</span></div>
-      <div class="t strange">样式 <span class="v">Tailwind CSS 3.4</span></div>
+      <div class="trow"><span class="k">Styling</span><span class="v">Tailwind CSS 3.4</span></div>
+      <div class="trow"><span class="k">Testing</span><span class="v">Vitest 4 + Playwright（111 用例）</span></div>
+      <div class="trow"><span class="k">Contract</span><span class="v">OpenAPI SSOT + Drift Gate</span></div>
+      <div class="trow"><span class="k">Observability</span><span class="v">Sentry（DSN 驱动双端）</span></div>
+      <div class="trow"><span class="k">Package</span><span class="v">pnpm 9 · 0 漏洞</span></div>
     </div>
   </div>
 </section>
@@ -140,9 +144,13 @@ footer a:hover{text-decoration:underline}
 <footer>
   <div class="wrap">
     <div class="brand">YanYuCloudCube</div>
-    <div class="motto">言启象限 | 语枢未来 — Words Initiate Quadrants, Language Serves as Core for Future</座右铭>
-    <p>以「五维驱动」落地「五高 · 五标 · 五化」</p>
-    <p>GitHub：<a href="https://github.com/YYC-Cube/YYC3-Novabook">YYC-Cube/YYC3-Novamind</a · <a href="/docs/openapi.generated.yaml">OpenAPI</a>
+    <div class="motto">言启象限 | 语枢未来 — Words Initiate Quadrants, Language Serves as Core for Future</div>
+    <p>万象归元于云枢 · 深栈智启新纪元 — All things converge in cloud pivot</p>
+    <p style="margin-top:12px">
+      <a href="https://github.com/YYC-Cube/YYC3-Novamind">GitHub</a>
+      &nbsp;·&nbsp;
+      <a href="/docs/openapi.generated.yaml">OpenAPI</a>
+    </p>
     <p class="copy">© 2025-2026 YanYuCloudCube™. All Rights Reserved.</p>
   </div>
 </footer>

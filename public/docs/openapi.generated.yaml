@@ -754,6 +754,9 @@ components:
                 - message
             - type: string
           description: 失败时的错误结构
+    FeedbackAnnotate: {}
+    FeedbackCreate: {}
+    FeedbackListResponse: {}
     ImageAnalyzeInfoResponse:
       type: object
       properties:
@@ -844,6 +847,7 @@ components:
                 - message
             - type: string
           description: 失败时的错误结构
+    McpRpcResponse: {}
     OfflineProcessRequest:
       type: object
       properties:
@@ -1807,6 +1811,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DatabaseQueryResponse'
+  /feedback:
+    get:
+      operationId: get-feedback
+      summary: ''
+      description: ''
+      tags:
+        - Feedback
+      parameters:
+        - in: query
+          name: rating
+          required: false
+          schema:
+            type: string
+          example: example
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: string
+          example: example
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackListResponse'
+    post:
+      operationId: post-feedback
+      summary: ''
+      description: ''
+      tags:
+        - Feedback
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackCreate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEnvelope'
+    patch:
+      operationId: patch-feedback
+      summary: ''
+      description: ''
+      tags:
+        - Feedback
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackAnnotate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEnvelope'
+  /mcp:
+    post:
+      operationId: post-mcp
+      summary: ''
+      description: ''
+      tags:
+        - Mcp
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpRpcResponse'
   /performance:
     get:
       operationId: get-performance
@@ -2112,6 +2196,8 @@ tags:
   - name: Auth
   - name: Chat
   - name: Database
+  - name: Feedback
+  - name: Mcp
   - name: Performance
   - name: Speech-to-text
   - name: Status
