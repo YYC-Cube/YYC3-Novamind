@@ -178,7 +178,7 @@ export default function LearningPathDetailPage() {
           <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div>
+          <div style={{ viewTransitionName: `path-card-${pathId}` }}>
             <h1 className="text-lg font-medium">{learningPath.title}</h1>
             <div className="flex items-center gap-4 text-sm text-gray-400">
               <span>进度: {Math.round(pathProgress)}%</span>

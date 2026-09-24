@@ -247,7 +247,7 @@ export default function ConversationPage() {
             <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div>
+            <div style={{ viewTransitionName: `conversation-card-${conversationId}` }}>
               <h1 className="font-medium text-gray-900">{conversation.title}</h1>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Clock className="w-4 h-4" />

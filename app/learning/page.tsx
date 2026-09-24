@@ -1,26 +1,27 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { LearningManager, type Achievement, type LearningPath, type LearningStats } from "@/lib/learning-manager"
+import { navigateWithTransition } from "@/lib/view-transitions"
 import {
+  ArrowRight,
+  Award,
+  BarChart3,
   BookOpen,
-  Target,
-  Trophy,
-  Clock,
-  Star,
-  Play,
   CheckCircle,
   Circle,
-  ArrowRight,
+  Clock,
+  Download,
+  Lightbulb,
+  Play,
   Plus,
   Search,
-  Download,
+  Star,
+  Target,
+  Trophy,
   Upload,
-  BarChart3,
-  Award,
-  Lightbulb,
 } from "lucide-react"
-import { LearningManager, type LearningPath, type Achievement, type LearningStats } from "@/lib/learning-manager"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function LearningPage() {
   const router = useRouter()
@@ -60,7 +61,7 @@ export default function LearningPage() {
   }
 
   const handlePathClick = (pathId: string) => {
-    router.push(`/learning-path/${pathId}`)
+    navigateWithTransition(() => router.push(`/learning-path/${pathId}`))
   }
 
   const handleStepToggle = async (pathId: string, stepId: string) => {
@@ -188,29 +189,26 @@ export default function LearningPage() {
           <div className="flex border-b border-gray-200">
             <button
               onClick={() => setActiveTab("paths")}
-              className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${
-                activeTab === "paths" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400 hover:text-white"
-              }`}
+              className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${activeTab === "paths" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400 hover:text-white"
+                }`}
             >
               <Target className="w-4 h-4" />
               <span>学习路径</span>
             </button>
             <button
               onClick={() => setActiveTab("achievements")}
-              className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${
-                activeTab === "achievements"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-400 hover:text-white"
-              }`}
+              className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${activeTab === "achievements"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-400 hover:text-white"
+                }`}
             >
               <Trophy className="w-4 h-4" />
               <span>成就系统</span>
             </button>
             <button
               onClick={() => setActiveTab("stats")}
-              className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${
-                activeTab === "stats" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400 hover:text-white"
-              }`}
+              className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${activeTab === "stats" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400 hover:text-white"
+                }`}
             >
               <BarChart3 className="w-4 h-4" />
               <span>学习统计</span>
@@ -264,6 +262,7 @@ export default function LearningPage() {
                 {filteredPaths.map((path) => (
                   <div
                     key={path.id}
+                    style={{ viewTransitionName: `path-card-${path.id}` }}
                     className="bg-surface-panel rounded-lg p-6 border border-gray-200 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -359,17 +358,15 @@ export default function LearningPage() {
                 {achievements.map((achievement) => (
                   <div
                     key={achievement.id}
-                    className={`rounded-lg p-6 border-2 transition-all ${
-                      achievement.unlocked
-                        ? "bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-300"
-                        : "bg-surface-panel border-gray-200"
-                    }`}
+                    className={`rounded-lg p-6 border-2 transition-all ${achievement.unlocked
+                      ? "bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-300"
+                      : "bg-surface-panel border-gray-200"
+                      }`}
                   >
                     <div className="flex items-start space-x-4">
                       <div
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                          achievement.unlocked ? "bg-yellow-500" : "bg-gray-400"
-                        }`}
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${achievement.unlocked ? "bg-yellow-500" : "bg-gray-400"
+                          }`}
                       >
                         <Award className="w-6 h-6 text-white" />
                       </div>

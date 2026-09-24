@@ -97,3 +97,16 @@
 .page-enter {
   animation: pageIn var(--motion-page);
 }
+
+/* ===== View Transitions 协调（P3-2）：过渡期间暂停全局翻页动画，防止新页快照捕获首帧透明导致闪黑 ===== */
+html.vt-active .page-enter {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 200ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

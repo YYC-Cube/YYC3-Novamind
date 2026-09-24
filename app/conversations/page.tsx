@@ -1,20 +1,21 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { ConversationManager, type Conversation } from "@/lib/conversation"
+import { navigateWithTransition } from "@/lib/view-transitions"
 import {
-  Search,
-  Plus,
+  Bookmark,
+  Clock,
+  Download,
   Filter,
   MessageSquare,
-  Clock,
-  Bookmark,
   MoreVertical,
-  Trash2,
+  Plus,
+  Search,
   Share2,
-  Download,
+  Trash2,
 } from "lucide-react"
-import { ConversationManager, type Conversation } from "@/lib/conversation"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function ConversationsPage() {
   const router = useRouter()
@@ -125,8 +126,9 @@ export default function ConversationsPage() {
     return (
       <div
         key={conversation.id}
+        style={{ viewTransitionName: `conversation-card-${conversation.id}` }}
         className="bg-surface-card rounded-lg border border-white/10 p-4 hover:shadow-md transition-shadow cursor-pointer"
-        onClick={() => router.push(`/conversation/${conversation.id}`)}
+        onClick={() => navigateWithTransition(() => router.push(`/conversation/${conversation.id}`))}
       >
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
