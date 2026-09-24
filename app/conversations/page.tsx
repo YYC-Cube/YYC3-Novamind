@@ -125,13 +125,13 @@ export default function ConversationsPage() {
     return (
       <div
         key={conversation.id}
-        className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+        className="bg-surface-card rounded-lg border border-white/10 p-4 hover:shadow-md transition-shadow cursor-pointer"
         onClick={() => router.push(`/conversation/${conversation.id}`)}
       >
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-gray-900 truncate mb-1">{conversation.title}</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <h3 className="font-medium text-white truncate mb-1">{conversation.title}</h3>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
               <Clock className="w-4 h-4" />
               <span>{formatTime(conversation.updatedAt)}</span>
               <span>•</span>
@@ -148,7 +148,7 @@ export default function ConversationsPage() {
                   e.stopPropagation()
                   // 显示操作菜单
                 }}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-white/10 rounded"
               >
                 <MoreVertical className="w-4 h-4" />
               </button>
@@ -159,7 +159,7 @@ export default function ConversationsPage() {
         {/* 预览最后一条消息 */}
         {conversation.messages.length > 0 && (
           <div className="mb-3">
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <p className="text-sm text-gray-400 line-clamp-2">
               {conversation.messages[conversation.messages.length - 1]?.content}
             </p>
           </div>
@@ -172,12 +172,12 @@ export default function ConversationsPage() {
               {conversation.context.domain}
             </span>
             {conversation.tags.slice(0, 2).map((tag, index) => (
-              <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+              <span key={index} className="px-2 py-1 bg-white/10 text-gray-200 text-xs rounded-full">
                 {tag}
               </span>
             ))}
             {conversation.tags.length > 2 && (
-              <span className="text-xs text-gray-500">+{conversation.tags.length - 2}</span>
+              <span className="text-xs text-gray-400">+{conversation.tags.length - 2}</span>
             )}
           </div>
 
@@ -187,7 +187,7 @@ export default function ConversationsPage() {
                 e.stopPropagation()
                 handleExportConversation(conversation.id)
               }}
-              className="p-1 hover:bg-gray-100 rounded text-gray-500"
+              className="p-1 hover:bg-white/10 rounded text-gray-400"
               title="导出对话"
             >
               <Download className="w-4 h-4" />
@@ -197,7 +197,7 @@ export default function ConversationsPage() {
                 e.stopPropagation()
                 // 实现分享功能
               }}
-              className="p-1 hover:bg-gray-100 rounded text-gray-500"
+              className="p-1 hover:bg-white/10 rounded text-gray-400"
               title="分享对话"
             >
               <Share2 className="w-4 h-4" />
@@ -207,7 +207,7 @@ export default function ConversationsPage() {
                 e.stopPropagation()
                 handleDeleteConversation(conversation.id)
               }}
-              className="p-1 hover:bg-gray-100 rounded text-red-500"
+              className="p-1 hover:bg-white/10 rounded text-red-500"
               title="删除对话"
             >
               <Trash2 className="w-4 h-4" />
@@ -219,12 +219,12 @@ export default function ConversationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-panel text-white">
       {/* 顶部导航栏 */}
       <header className="bg-white border-b px-4 py-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">对话历史</h1>
+            <h1 className="text-2xl font-bold text-white">对话历史</h1>
             <button
               onClick={() => router.push("/")}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
@@ -243,13 +243,13 @@ export default function ConversationsPage() {
                 placeholder="搜索对话..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
               />
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+              className="px-4 py-2 border border-white/20 rounded-lg hover:bg-white/10 flex items-center gap-2"
             >
               <Filter className="w-4 h-4" />
               筛选
@@ -258,14 +258,14 @@ export default function ConversationsPage() {
 
           {/* 筛选器 */}
           {showFilters && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-4 p-4 bg-white/5 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">标签</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">标签</label>
                   <select
                     value={selectedTag}
                     onChange={(e) => setSelectedTag(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
                   >
                     <option value="all">全部标签</option>
                     {getAllTags().map((tag) => (
@@ -277,11 +277,11 @@ export default function ConversationsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">领域</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">领域</label>
                   <select
                     value={selectedDomain}
                     onChange={(e) => setSelectedDomain(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
                   >
                     <option value="all">全部领域</option>
                     {getAllDomains().map((domain) => (
@@ -293,11 +293,11 @@ export default function ConversationsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">排序方式</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">排序方式</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
                   >
                     <option value="updated">最近更新</option>
                     <option value="created">创建时间</option>
@@ -315,10 +315,10 @@ export default function ConversationsPage() {
         {filteredConversations.length === 0 ? (
           <div className="text-center py-12">
             <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-white mb-2">
               {searchQuery ? "未找到匹配的对话" : "还没有对话记录"}
             </h3>
-            <p className="text-gray-500 mb-4">{searchQuery ? "尝试调整搜索条件" : "开始您的第一次对话吧"}</p>
+            <p className="text-gray-400 mb-4">{searchQuery ? "尝试调整搜索条件" : "开始您的第一次对话吧"}</p>
             <button
               onClick={() => router.push("/")}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -337,7 +337,7 @@ export default function ConversationsPage() {
       {conversations.length > 0 && (
         <div className="bg-white border-t px-4 py-4">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center justify-between text-sm text-gray-400">
               <span>
                 共 {conversations.length} 个对话，显示 {filteredConversations.length} 个
               </span>

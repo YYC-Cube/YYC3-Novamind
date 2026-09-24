@@ -100,7 +100,7 @@ export default function LearningPathDetailPage() {
       case "assessment":
         return "bg-purple-100 text-purple-600"
       default:
-        return "bg-gray-100 text-gray-600"
+        return "bg-white/10 text-gray-400"
     }
   }
 
@@ -157,10 +157,10 @@ export default function LearningPathDetailPage() {
 
   if (!learningPath) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-panel flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">加载学习路径中...</p>
+          <p className="text-gray-400">加载学习路径中...</p>
         </div>
       </div>
     )
@@ -171,32 +171,32 @@ export default function LearningPathDetailPage() {
   const pathProgress = stats?.progress ?? 0
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-panel">
       {/* 顶部导航栏 */}
-      <header className="bg-white border-b px-4 py-3 flex items-center justify-between">
+      <header className="bg-black/30 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded">
+          <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-lg font-medium">{learningPath.title}</h1>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-4 text-sm text-gray-400">
               <span>进度: {Math.round(pathProgress)}%</span>
               <span>状态: {pathProgress >= 100 ? "已完成" : "进行中"}</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="p-2 hover:bg-gray-100 rounded">
+          <button className="p-2 hover:bg-white/10 rounded">
             <Share2 className="w-5 h-5" />
           </button>
           <div className="relative">
-            <button onClick={() => setShowMenu(!showMenu)} className="p-2 hover:bg-gray-100 rounded">
+            <button onClick={() => setShowMenu(!showMenu)} className="p-2 hover:bg-white/10 rounded">
               <MoreVertical className="w-5 h-5" />
             </button>
             {showMenu && (
               <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
-                <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2">
+                <button className="w-full px-4 py-2 text-left hover:bg-white/10 flex items-center gap-2">
                   <Edit3 className="w-4 h-4" />
                   编辑路径
                 </button>
@@ -211,12 +211,12 @@ export default function LearningPathDetailPage() {
           {/* 左侧主要内容 */}
           <div className="lg:col-span-2 space-y-6">
             {/* 进度概览 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="bg-surface-card rounded-lg p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">学习进度</h2>
+                <h2 className="text-lg font-semibold text-white">学习进度</h2>
                 <div className="text-2xl font-bold text-blue-600">{Math.round(pathProgress)}%</div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+              <div className="w-full bg-white/10 rounded-full h-3 mb-4">
                 <div
                   className="bg-blue-600 h-3 rounded-full transition-all duration-300"
                   style={{ width: `${pathProgress}%` }}
@@ -225,16 +225,16 @@ export default function LearningPathDetailPage() {
               {stats && (
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <div className="text-lg font-semibold text-gray-900">{stats.completedSteps}</div>
-                    <div className="text-sm text-gray-500">已完成</div>
+                    <div className="text-lg font-semibold text-white">{stats.completedSteps}</div>
+                    <div className="text-sm text-gray-400">已完成</div>
                   </div>
                   <div>
-                    <div className="text-lg font-semibold text-gray-900">{stats.totalSteps}</div>
-                    <div className="text-sm text-gray-500">总步骤</div>
+                    <div className="text-lg font-semibold text-white">{stats.totalSteps}</div>
+                    <div className="text-sm text-gray-400">总步骤</div>
                   </div>
                   <div>
-                    <div className="text-lg font-semibold text-gray-900">{formatTime(stats.completedTime)}</div>
-                    <div className="text-sm text-gray-500">已学习</div>
+                    <div className="text-lg font-semibold text-white">{formatTime(stats.completedTime)}</div>
+                    <div className="text-sm text-gray-400">已学习</div>
                   </div>
                 </div>
               )}
@@ -249,11 +249,11 @@ export default function LearningPathDetailPage() {
                 </div>
                 <div className="space-y-2">
                   {nextSteps.slice(0, 2).map((step) => (
-                    <div key={step.id} className="flex items-center gap-3 p-3 bg-white rounded-lg">
+                    <div key={step.id} className="flex items-center gap-3 p-3 bg-surface-card rounded-lg">
                       <div className={`p-2 rounded-lg ${getStepColor(step.type)}`}>{getStepIcon(step.type)}</div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{step.title}</h4>
-                        <p className="text-sm text-gray-600">{formatTime(step.estimatedTime)}</p>
+                        <h4 className="font-medium text-white">{step.title}</h4>
+                        <p className="text-sm text-gray-400">{formatTime(step.estimatedTime)}</p>
                       </div>
                       <button
                         onClick={() => setActiveStep(step.id)}
@@ -268,9 +268,9 @@ export default function LearningPathDetailPage() {
             )}
 
             {/* 学习步骤列表 */}
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="bg-surface-card rounded-lg shadow-sm">
               <div className="p-6 border-b">
-                <h2 className="text-lg font-semibold text-gray-900">学习步骤</h2>
+                <h2 className="text-lg font-semibold text-white">学习步骤</h2>
               </div>
               <div className="divide-y">
                 {learningPath.steps.map((step, _index) => (
@@ -290,11 +290,11 @@ export default function LearningPathDetailPage() {
                         <div className="flex items-center gap-3 mb-2">
                           <div className={`p-1 rounded ${getStepColor(step.type)}`}>{getStepIcon(step.type)}</div>
                           <h3
-                            className={`font-medium ${isStepCompleted(step) ? "text-gray-500 line-through" : "text-gray-900"}`}
+                            className={`font-medium ${isStepCompleted(step) ? "text-gray-400 line-through" : "text-white"}`}
                           >
                             {step.title}
                           </h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 text-sm text-gray-400">
                             <div className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
                               <span>{formatTime(step.estimatedTime)}</span>
@@ -307,22 +307,22 @@ export default function LearningPathDetailPage() {
                         </div>
 
                         {/* 步骤描述 */}
-                        <p className="text-gray-600 mb-4">{step.description}</p>
+                        <p className="text-gray-400 mb-4">{step.description}</p>
 
                         {/* 学习资源 */}
                         {step.resources.length > 0 && (
                           <div className="mb-4">
-                            <h4 className="font-medium text-gray-900 mb-2">学习资源</h4>
+                            <h4 className="font-medium text-white mb-2">学习资源</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {step.resources.map((resource) => (
                                 <div
                                   key={resource.id}
-                                  className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                                  className="flex items-center gap-3 p-3 border border-white/10 rounded-lg hover:bg-white/10"
                                 >
-                                  <div className="text-gray-500">{getResourceIcon(resource.type)}</div>
+                                  <div className="text-gray-400">{getResourceIcon(resource.type)}</div>
                                   <div className="flex-1 min-w-0">
-                                    <h5 className="font-medium text-gray-900 truncate">{resource.title}</h5>
-                                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                                    <h5 className="font-medium text-white truncate">{resource.title}</h5>
+                                    <div className="flex items-center gap-2 text-sm text-gray-400">
                                       <span>{resource.duration ? formatTime(resource.duration) : "时长未知"}</span>
                                       {resource.rating && (
                                         <>
@@ -353,7 +353,7 @@ export default function LearningPathDetailPage() {
                             {step.notes ? "查看笔记" : "添加笔记"}
                           </button>
                           {step.completedAt && (
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-gray-400">
                               完成于 {new Date(step.completedAt).toLocaleDateString("zh-CN")}
                             </span>
                           )}
@@ -361,13 +361,13 @@ export default function LearningPathDetailPage() {
 
                         {/* 笔记编辑 */}
                         {showNotes === step.id && (
-                          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                          <div className="mt-4 p-4 bg-white/5 rounded-lg">
                             <textarea
                               value={noteText}
                               onChange={(e) => setNoteText(e.target.value)}
                               placeholder="记录学习心得、重点内容或疑问..."
                               rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                              className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                             />
                             <div className="flex items-center gap-2 mt-3">
                               <button
@@ -378,7 +378,7 @@ export default function LearningPathDetailPage() {
                               </button>
                               <button
                                 onClick={() => setShowNotes(null)}
-                                className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded text-sm"
+                                className="px-3 py-1 text-gray-400 hover:bg-white/10 rounded text-sm"
                               >
                                 取消
                               </button>
@@ -396,19 +396,19 @@ export default function LearningPathDetailPage() {
           {/* 右侧边栏 */}
           <div className="space-y-6">
             {/* 路径信息 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-4">路径信息</h3>
+            <div className="bg-surface-card rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold text-white mb-4">路径信息</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">总时长:</span>
+                  <span className="text-gray-400">总时长:</span>
                   <span className="font-medium">{formatTime(stats?.totalEstimatedTime ?? 0)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">创建时间:</span>
+                  <span className="text-gray-400">创建时间:</span>
                   <span className="font-medium">{new Date(learningPath.createdAt).toLocaleDateString("zh-CN")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">最后更新:</span>
+                  <span className="text-gray-400">最后更新:</span>
                   <span className="font-medium">{new Date(learningPath.updatedAt).toLocaleDateString("zh-CN")}</span>
                 </div>
               </div>
@@ -416,15 +416,15 @@ export default function LearningPathDetailPage() {
 
             {/* 学习统计 */}
             {stats && (
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-4">学习统计</h3>
+              <div className="bg-surface-card rounded-lg p-6 shadow-sm">
+                <h3 className="font-semibold text-white mb-4">学习统计</h3>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span>完成率</span>
                       <span>{Math.round(stats.progress)}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-white/10 rounded-full h-2">
                       <div className="bg-green-500 h-2 rounded-full" style={{ width: `${stats.progress}%` }} />
                     </div>
                   </div>
@@ -433,7 +433,7 @@ export default function LearningPathDetailPage() {
                       <span>时间进度</span>
                       <span>{Math.round((stats.completedTime / stats.totalEstimatedTime) * 100)}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-white/10 rounded-full h-2">
                       <div
                         className="bg-blue-500 h-2 rounded-full"
                         style={{ width: `${(stats.completedTime / stats.totalEstimatedTime) * 100}%` }}
@@ -441,23 +441,23 @@ export default function LearningPathDetailPage() {
                     </div>
                   </div>
                   <div className="pt-2 border-t">
-                    <div className="text-sm text-gray-600">平均难度: {stats.averageStepDifficulty.toFixed(1)} 星</div>
+                    <div className="text-sm text-gray-400">平均难度: {stats.averageStepDifficulty.toFixed(1)} 星</div>
                   </div>
                 </div>
               </div>
             )}
 
             {/* 快速操作 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-4">快速操作</h3>
+            <div className="bg-surface-card rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold text-white mb-4">快速操作</h3>
               <div className="space-y-3">
                 <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
                   生成学习报告
                 </button>
-                <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+                <button className="w-full px-4 py-2 border border-white/20 text-gray-200 rounded-lg hover:bg-white/10 text-sm">
                   导出学习计划
                 </button>
-                <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+                <button className="w-full px-4 py-2 border border-white/20 text-gray-200 rounded-lg hover:bg-white/10 text-sm">
                   分享给朋友
                 </button>
               </div>

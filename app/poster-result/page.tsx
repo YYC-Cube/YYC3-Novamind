@@ -135,11 +135,11 @@ export default function PosterResultPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-panel flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">正在生成海报...</p>
-          <p className="text-gray-500 text-sm mt-2">AI正在为您创作独特的视觉设计</p>
+          <p className="text-gray-400 text-lg">正在生成海报...</p>
+          <p className="text-gray-400 text-sm mt-2">AI正在为您创作独特的视觉设计</p>
         </div>
       </div>
     )
@@ -147,12 +147,12 @@ export default function PosterResultPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-panel flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
             <span className="text-red-600 text-2xl">⚠</span>
           </div>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <p className="text-gray-400 mb-4">{error}</p>
           <div className="space-x-4">
             <button
               onClick={handleRegenerate}
@@ -174,9 +174,9 @@ export default function PosterResultPage() {
 
   if (!poster) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-panel flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">海报生成失败</p>
+          <p className="text-gray-400 mb-4">海报生成失败</p>
           <button
             onClick={() => router.back()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -189,42 +189,42 @@ export default function PosterResultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-panel">
       {/* 顶部导航 */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-black/30 backdrop-blur-xl border-b border-white/10 border-white/10 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900">海报生成结果</h1>
+            <h1 className="text-lg font-semibold text-white">海报生成结果</h1>
           </div>
 
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
               title="主题设置"
             >
               <Palette className="w-5 h-5" />
             </button>
             <button
               onClick={handleCopy}
-              className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
               title="复制SVG代码"
             >
               {copySuccess ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
             </button>
             <button
               onClick={handleShare}
-              className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
               title="分享海报"
             >
               {shareSuccess ? <Check className="w-5 h-5 text-green-600" /> : <Share2 className="w-5 h-5" />}
             </button>
             <button
               onClick={handleRegenerate}
-              className="p-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
               title="重新生成"
             >
               <RefreshCw className="w-5 h-5" />
@@ -237,10 +237,10 @@ export default function PosterResultPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* 海报预览 */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div className="bg-surface-card rounded-lg p-6 shadow-sm border border-white/10">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">海报预览</h2>
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <h2 className="text-xl font-semibold text-white">海报预览</h2>
+                <div className="flex items-center space-x-2 text-sm text-gray-400">
                   <Eye className="w-4 h-4" />
                   <span>主题: {themes.find((t) => t.key === selectedTheme)?.name}</span>
                 </div>
@@ -248,7 +248,7 @@ export default function PosterResultPage() {
 
               {/* 海报显示区域 */}
               <div className="flex justify-center">
-                <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
+                <div className="bg-white/5 p-4 rounded-lg shadow-inner">
                   <div
                     className="bg-white rounded shadow-lg overflow-hidden"
                     style={{ maxWidth: "400px", maxHeight: "600px" }}
@@ -289,12 +289,12 @@ export default function PosterResultPage() {
           {/* 侧边栏 */}
           <div className="space-y-6">
             {/* 主题选择 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div className="bg-surface-card rounded-lg p-6 shadow-sm border border-white/10">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">主题选择</h3>
+                <h3 className="text-lg font-semibold text-white">主题选择</h3>
                 <button
                   onClick={() => setShowSettings(!showSettings)}
-                  className="p-1 text-gray-400 hover:text-gray-600"
+                  className="p-1 text-gray-400 hover:text-gray-400"
                 >
                   <Settings className="w-4 h-4" />
                 </button>
@@ -308,14 +308,14 @@ export default function PosterResultPage() {
                     className={`w-full text-left p-3 rounded-lg border transition-colors ${
                       selectedTheme === themeOption.key
                         ? "border-blue-300 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        : "border-white/10 hover:border-white/20 hover:bg-white/10"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className={`w-4 h-4 rounded ${themeOption.color}`}></div>
                       <div className="flex-1">
                         <div className="font-medium">{themeOption.name}</div>
-                        <div className="text-sm text-gray-500 mt-1">{themeOption.description}</div>
+                        <div className="text-sm text-gray-400 mt-1">{themeOption.description}</div>
                       </div>
                     </div>
                   </button>
@@ -324,41 +324,41 @@ export default function PosterResultPage() {
             </div>
 
             {/* 海报信息 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">海报信息</h3>
+            <div className="bg-surface-card rounded-lg p-6 shadow-sm border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4">海报信息</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">标题:</span>
+                  <span className="text-gray-400">标题:</span>
                   <span className="font-medium text-right flex-1 ml-2 truncate">{poster.config.title}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">主题:</span>
+                  <span className="text-gray-400">主题:</span>
                   <span className="font-medium">{themes.find((t) => t.key === selectedTheme)?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">尺寸:</span>
+                  <span className="text-gray-400">尺寸:</span>
                   <span className="font-medium">
                     {poster.config.size.width} × {poster.config.size.height}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">格式:</span>
+                  <span className="text-gray-400">格式:</span>
                   <span className="font-medium">SVG 矢量图</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">生成时间:</span>
+                  <span className="text-gray-400">生成时间:</span>
                   <span className="font-medium">{new Date(poster.timestamp).toLocaleTimeString()}</span>
                 </div>
               </div>
             </div>
 
             {/* 快速操作 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">快速操作</h3>
+            <div className="bg-surface-card rounded-lg p-6 shadow-sm border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4">快速操作</h3>
               <div className="space-y-3">
                 <button
                   onClick={() => router.push(`/results?query=${encodeURIComponent(query)}`)}
-                  className="w-full flex items-center space-x-3 p-3 text-left rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                  className="w-full flex items-center space-x-3 p-3 text-left rounded-lg border border-white/10 hover:border-blue-300 hover:bg-blue-50 transition-colors"
                 >
                   <Eye className="w-5 h-5 text-blue-600" />
                   <span className="text-gray-800">查看搜索结果</span>
@@ -366,7 +366,7 @@ export default function PosterResultPage() {
 
                 <button
                   onClick={() => router.push(`/generate/mindmap?query=${encodeURIComponent(query)}`)}
-                  className="w-full flex items-center space-x-3 p-3 text-left rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                  className="w-full flex items-center space-x-3 p-3 text-left rounded-lg border border-white/10 hover:border-purple-300 hover:bg-purple-50 transition-colors"
                 >
                   <Settings className="w-5 h-5 text-purple-600" />
                   <span className="text-gray-800">生成思维导图</span>
@@ -374,7 +374,7 @@ export default function PosterResultPage() {
 
                 <button
                   onClick={() => router.push(`/community/share?content=${encodeURIComponent(poster.svgContent)}`)}
-                  className="w-full flex items-center space-x-3 p-3 text-left rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors"
+                  className="w-full flex items-center space-x-3 p-3 text-left rounded-lg border border-white/10 hover:border-green-300 hover:bg-green-50 transition-colors"
                 >
                   <Share2 className="w-5 h-5 text-green-600" />
                   <span className="text-gray-800">分享到社区</span>

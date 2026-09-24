@@ -221,11 +221,11 @@ export default function FavoritesPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-panel text-white">
       {/* 顶部导航栏 */}
-      <header className="bg-white border-b px-4 py-3 flex items-center justify-between">
+      <header className="bg-black/30 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded">
+          <button onClick={() => router.back()} className="p-2 hover:bg-white/10 rounded">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-medium flex items-center gap-2">
@@ -234,7 +234,7 @@ export default function FavoritesPage() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">共 {favorites.length} 个收藏</span>
+          <span className="text-sm text-gray-400">共 {favorites.length} 个收藏</span>
           <div className="flex gap-2">
             <button
               onClick={handleExport}
@@ -254,7 +254,7 @@ export default function FavoritesPage() {
 
       <div className="max-w-6xl mx-auto px-6 py-6">
         {/* 搜索和过滤栏 */}
-        <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
+        <div className="bg-surface-card rounded-lg p-4 shadow-sm mb-6">
           <div className="flex flex-col gap-4">
             {/* 搜索栏 */}
             <div className="relative">
@@ -271,7 +271,7 @@ export default function FavoritesPage() {
             {/* 过滤器 */}
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
+                <Filter className="w-4 h-4 text-gray-400" />
                 <span className="text-sm text-gray-600">类型:</span>
                 <select
                   value={selectedType}
@@ -322,12 +322,12 @@ export default function FavoritesPage() {
 
         {/* 收藏列表 */}
         {filteredFavorites.length === 0 ? (
-          <div className="bg-white rounded-lg p-12 text-center shadow-sm">
+          <div className="bg-surface-card rounded-lg p-12 text-center shadow-sm">
             <Heart className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-white mb-2">
               {favorites.length === 0 ? "还没有收藏内容" : "没有找到匹配的收藏"}
             </h3>
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-400 mb-4">
               {favorites.length === 0 ? "开始收藏您感兴趣的内容吧" : "尝试调整搜索或过滤条件"}
             </p>
             {favorites.length === 0 && (
@@ -342,7 +342,7 @@ export default function FavoritesPage() {
         ) : (
           <div className="grid gap-4">
             {filteredFavorites.map((favorite) => (
-              <div key={favorite.id} className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div key={favorite.id} className="bg-surface-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
@@ -356,10 +356,10 @@ export default function FavoritesPage() {
                       )}
                     </div>
 
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate">{favorite.title}</h3>
+                    <h3 className="text-lg font-semibold text-white mb-2 truncate">{favorite.title}</h3>
                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">{favorite.content}</p>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                    <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
                         <span>{formatTime(favorite.timestamp)}</span>
@@ -410,7 +410,7 @@ export default function FavoritesPage() {
                           </button>
                           <button
                             onClick={() => setEditingNote(null)}
-                            className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm"
+                            className="px-3 py-1 bg-white/20 text-gray-200 rounded text-sm"
                           >
                             取消
                           </button>
@@ -440,7 +440,7 @@ export default function FavoritesPage() {
                   <div className="relative ml-4">
                     <button
                       onClick={() => setSelectedFavorite(selectedFavorite === favorite.id ? null : favorite.id)}
-                      className="p-2 hover:bg-gray-100 rounded"
+                      className="p-2 hover:bg-white/10 rounded"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
@@ -452,7 +452,7 @@ export default function FavoritesPage() {
                             handleAddNote(favorite.id)
                             setSelectedFavorite(null)
                           }}
-                          className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
+                          className="w-full px-4 py-2 text-left hover:bg-white/10 flex items-center gap-2"
                         >
                           <Edit3 className="w-4 h-4" />
                           {favorite.metadata?.notes ? "编辑笔记" : "添加笔记"}
@@ -462,7 +462,7 @@ export default function FavoritesPage() {
                             handleRemoveFavorite(favorite.id)
                             setSelectedFavorite(null)
                           }}
-                          className="w-full px-4 py-2 text-left hover:bg-gray-50 text-red-600 flex items-center gap-2"
+                          className="w-full px-4 py-2 text-left hover:bg-white/10 text-red-600 flex items-center gap-2"
                         >
                           <Trash2 className="w-4 h-4" />
                           移除收藏
